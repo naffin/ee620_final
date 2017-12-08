@@ -2,7 +2,7 @@ package Transaction_pkg;
 	import Opcode_pkg::*;
 class Transaction;
 	// stimulus
-	rand OpCode opCode;
+	rand OpCode opcode;
 	rand bit [2:0] dr;
 	rand bit [2:0] sr;
 	rand bit [2:0] sr1;
@@ -20,13 +20,13 @@ class Transaction;
 	
 	// state 
 	bit [15:0] reg_file [0:7];
-	bit [15:0] pcvalue;
+	bit [15:0] pc;
 	bit [15:0] ir;
 	bit [15:0] mar, mdr;
 	bit n, z, p;
 
 	// queues
-	bit [15:0] addr_access_q [$];	
+ 	bit [15:0] addr_access_q [$];	
 	bit [15:0] data_in_q [$];	
 
 	constraint rst_counter_value {
