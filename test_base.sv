@@ -9,7 +9,7 @@ package Test_base_pkg;
    import svm_component_registry_pkg::*;
    import svm_component_pkg::*;
    import driver_cbs_scb_pkg::*;
-
+   import Coverage_pkg::*;
 class Test_base extends svm_component;
 	Environment env;
 	`svm_component_utils(Test_base)
@@ -25,6 +25,8 @@ class Test_base extends svm_component;
 		env.build();
 		begin
 		    Driver_cbs_scb dcs = new(env.scb);
+		   Coverage cov = new();
+		   env.check.cov = cov;
 		    env.drv.cbs.push_back(dcs);
 		end
 		env.run();

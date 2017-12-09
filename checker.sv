@@ -1,11 +1,12 @@
 package Checker_pkg;
 	import Transaction_pkg::*;
+   import Coverage_base_pkg::*;
 class Checker;
 	Transaction t_scb, t_mon;
 	// mailbox from scoreboard to checker
 	mailbox #(Transaction) scb2check;
 	mailbox #(Transaction) mon2check;;
-
+   Coverage_base cov;
 	function new(Transaction t_scb, t_mon);
 		this.t_scb = t_scb;
 		this.t_mon = t_mon;
@@ -43,9 +44,12 @@ class Checker;
 	endfunction
 
 	task run();
+	   forever begin
 		@(scb2check.get(t_scb));
 		@(mon2check.get(t_mon));
 		compare();
+	      cov.sample(t_mon);
+	   end
 	endtask
 
 endclass // checker

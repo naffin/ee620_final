@@ -12,7 +12,8 @@ package Environment_pkg;
    import Transaction_pkg::*;
    import Generator_pkg::*;
    import Driver_pkg::*;
-   
+   import Monitor_pkg::*;
+   import Checker_pkg::*;
 
 class Config;
    rand bit [31:0] run_for_n_trans;
@@ -27,7 +28,10 @@ class Environment;
    Driver drv;
    Config cfg;
    Scoreboard scb;
-
+   Checker check;
+   Monitor mon;
+   
+   
    function void build();
       // initialize mailbox
       gen2drv = new(1);
@@ -39,13 +43,16 @@ class Environment;
       gen = new(gen2drv);
       drv = new(gen2drv,drv2mon);
       scb = new(scb2check);
-      
+      mon = new(drv2mon,mon2check);
+      check = new(scb2check,mon2check);
    endfunction
    
    task run();
       fork
-	 gen.run(cfg.run_for_n_trans);
-	 drv.run(cfg.run_for_n_trans);
+	 gen.run();
+	 drv.run();
+	 mon.run();
+	 check.run();
       join
    endtask // run
 

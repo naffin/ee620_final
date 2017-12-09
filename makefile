@@ -15,11 +15,12 @@
 ##
 ############################################################################
 TRANSACTION_FILES = opcode.sv transaction.sv
+COVERAGE_FILES = coverage_base.sv coverage.sv
 DRIVER_FILES = monitor.sv checker.sv scoreboard.sv driver_cbs.sv driver_cbs_scb.sv driver.sv
 ENV_FILES =  generator.sv environment.sv lc3_if.sv
 SVM_FILES = svm_component.sv svm_component_wrapper.sv svm_factory.sv svm_component_reg.sv   
 TEST_FILES = test_base.sv test.sv
-VERILOG_FILES = ${TRANSACTION_FILES} ${DRIVER_FILES} ${ENV_FILES} ${SVM_FILES} ${TEST_FILES} top.sv	
+VERILOG_FILES = ${TRANSACTION_FILES} ${COVERAGE_FILES} ${DRIVER_FILES} ${ENV_FILES} ${SVM_FILES} ${TEST_FILES} top.sv	
 TOPLEVEL = top
 
 help:

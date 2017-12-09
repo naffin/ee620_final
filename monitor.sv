@@ -1,6 +1,6 @@
-package monitor_pkg;
+package Monitor_pkg;
 	import transaction_pkg::*;
-class monitor;
+class Monitor;
 	// coverage call backs
 	virtual lc3_if.MONITOR lc3if;
 	Transaction t;
