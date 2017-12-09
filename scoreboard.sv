@@ -10,7 +10,29 @@ class Scoreboard;
    bit [15:0] addr_access_q [$];	
    bit [15:0] data_in_q [$];
    Transaction t;
+   mailbox #(Transaction) agt2scb;
 
+   function new(mailbox #(Transaction) agt2scb);
+      this.agt2scb = agt2scb;
+   endfunction
+
+   task run();
+      reset_golden();
+      forever begin
+	 
+      end
+   endtask // run
+
+   function void reset_golden();
+      reg_file = '0;
+      pc = 0;
+      ir = 0;
+      mar = 0;
+      mdr = 0;
+      n = 0;
+      z = 0;
+      p = 0;
+   end
 
    function bit[15:0] get_alu_src2();
       if(t.imm5_flag)
@@ -38,17 +60,19 @@ class Scoreboard;
 
    function void update_golden();
       fetch();
-      exec();
-      mem();
+      update_regs_and_flags();
+      update_mem();
    endfunction // update_state
    
    function void fetch();
       addr_access_q.push_back(pc);
+      mar = pc;
       pc++;
       IR = t.get_instruction();
+      mdr = IR;
    endfunction // update_state_all_ops
 
-   function void exec();
+   function void update_regs_and_flags();
       case(t.opcode)
 	ADD:
 	  set_dr(t.sr1 + get_alu_src2(t));
@@ -72,23 +96,43 @@ class Scoreboard;
       endcase
    endfunction // update_state_per_op
 
-   function void mem();
-      
+   function void update_mem();
+      update_mem_access();
+      update_mem_data();
+   endfunction
+
+   function void update_mem_access();
       case(t.opcode)
-	LD,ST:
-	  addr_access_q.push_back(pc + signed(t.PCoffset9));
-	LDR,STR:
-	  addr_access_q.push_back(reg_file[t.BaseR] + signed(t.PCoffset9));
-	LDI,STI: begin
-	  addr_access_q.push_back(pc + signed(t.PCoffset9));
-	  addr_access_q.push_back(t.data1);
+	LD,ST: begin
+	   addr_access_q.push_back(pc + signed(t.PCoffset9));
+	   mar = pc + signed(t.PCoffset9);
 	end
+	LDR,STR: begin
+	   addr_access_q.push_back(reg_file[t.BaseR] + signed(t.offset6));
+	   mar = reg_file[t.BaseR] + signed(t.offset6);
+	end
+	LDI,STI: begin
+	   addr_access_q.push_back(pc + signed(t.PCoffset9));
+	   addr_access_q.push_back(t.data1);
+	   mar = t.data1;
+	end
+      endcase // case (t.opcode)
+   endfunction // update_queues
+   
+   function void update_mem_data();
+      case(t.opcode)
+	ST,STI,STR: begin
+	   t.data_in_q.push_back(reg_file[t.sr]);
+	   mdr = reg_file[t.sr];
+	end
+	LD,LDR:
+	  mdr = t.data1;
+	LDI:
+	  mdr = t.data2;
+	default:
+	  mdr = t.get_instruction();
       endcase
-      if(t.opcode inside {ST,STI,STR})
-	t.data_in_q.push_back(reg_file[t.sr]);
    endfunction // update_access_q
 
-   function void update_data_in_q();
-   endfunction
 endclass // Scoreboard
 endpackage
