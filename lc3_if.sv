@@ -7,7 +7,7 @@ interface lc3_if (input bit clk);
 	clocking cb @(posedge clk);
 		output data_out; // for the driver
 		input data_in; // for the monitor
-		input memWE; // for the monitor
+		input memWE; 
 	endclocking
 
 	modport TEST (clocking cb, output rst); // asynch. rst

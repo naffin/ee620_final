@@ -8,6 +8,7 @@ class monitor;
 	mailbox #(Transaction) mon2check;
 	bit [15:0] addr_access_q [$];
 	bit [15:0] data_in_q [$];	
+	bit [15:0] reg_file [0:7];
 
 	function new(mailbox #(Transaction) drv2mon, virtual lc3_if.MONITOR lc3if);
 		drv2mon.this = drv2mon;	
@@ -15,20 +16,24 @@ class monitor;
 		t = new;
 	endfunction
 
-
 	task set_states();
-		while(); begin
+		while() begin
 			@(drv2mon.peek(t));
 			t.addr_access_q = addr_access_q;
 			t.data_in_q = data_in_q;
+			t.reg_file = $root.top.DUT.reg_file;
 			mon2check.put(t);
+			// delete contents in queues
+			addr_access_q = {}; 
+			data_in_q = {};
 		end
 	end
 
 	task set_queues();
-		while(); begin
-			@(lc3if.cb);
-			addr_access_q.push_back(lc3if	
+		while() begin
+			@(lc3if.cb.memWE);
+			addr_access_q.push_back(lc3if.cb.addr);
+			data_in_q.push_back(lc3if.cb.data_in);
 		end	
 	end
 
