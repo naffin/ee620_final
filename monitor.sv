@@ -28,8 +28,7 @@ class monitor;
 	task set_queues();
 		while(); begin
 			@(lc3if.cb);
-			addr_access_q.push_back(lc3if.
-			
+			addr_access_q.push_back(lc3if	
 		end	
 	end
 
