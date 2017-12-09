@@ -1,12 +1,12 @@
 interface lc3_if (input bit clk);
-	bit reset;
+	bit rst;
 	bit [15:0] data_out, data_in;
 	logic [15:0] addr;
-	logic memWE;
+	logic memWE,ldMAR;
 	
 	clocking cb @(posedge clk);
 		output data_out; // for the driver
-		input data_in; // for the monitor
+		input data_in,addr; // for the monitor
 		input memWE, ldMAR;
 	endclocking
 

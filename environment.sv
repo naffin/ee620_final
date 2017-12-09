@@ -23,7 +23,7 @@ class Config;
 endclass : Config
 
 class Environment;
-   virtual lc3_if.TEST lc3if;
+   virtual lc3_if lc3if = $root.top.lc3if;
    mailbox #(Transaction) gen2drv,drv2mon,mon2check,scb2check; 
    Generator gen;
    Driver drv;
@@ -31,11 +31,7 @@ class Environment;
    Scoreboard scb;
    Checker check;
    Monitor mon;
-   
-   function new (virtual lc3_if.TEST lc3if)
-      this.lc3if = lc3if;
-   endfunction
-   
+      
    function void build();
       // initialize mailbox
       gen2drv = new(1);
@@ -47,7 +43,7 @@ class Environment;
       gen = new(gen2drv);
       drv = new(gen2drv,drv2mon,lc3if);
       scb = new(scb2check);
-      mon = new(drv2mon,mon2check);
+      mon = new(drv2mon,mon2check,lc3if);
       check = new(scb2check,mon2check);
    endfunction
    

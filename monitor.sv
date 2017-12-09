@@ -22,7 +22,7 @@ class Monitor;
 			drv2mon.get(t);
 			t.addr_access_q = addr_access_q;
 			t.data_in_q = data_in_q;
-			t.reg_file = $root.top.DUT.reg_file;
+			//t.reg_file = $root.top.DUT.reg_file;
 			mon2check.put(t);
 			// delete contents in queues
 			addr_access_q = {}; 

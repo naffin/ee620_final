@@ -9,6 +9,7 @@ class Driver;
    Driver_cbs cbs[$];
    logic [15:0] inst;
    virtual lc3_if.TEST lc3if;
+   Transaction t;
 
    function new(mailbox #(Transaction) gen2drv,mailbox #(Transaction) drv2mon, 
 				input virtual lc3_if.TEST lc3if);
@@ -18,13 +19,12 @@ class Driver;
    endfunction // new
 
    task run();
-      Transaction t;
       gen2drv.peek(t);
       while(1) begin
    	     foreach(cbs[i]) begin
    	        cbs[i].pre_tx(t);
    	     end
-   	     transmit(t);
+   	     transmit();
    	     foreach(cbs[i]) begin
    	        cbs[i].post_tx(t);
    	     end
@@ -32,32 +32,28 @@ class Driver;
 	  end
    endtask // run
 
-   task transmit_inst();
+   task transmit();
 	  int num_clks = 0;
 
-	  case(t.opcode) :
+	  case(t.opcode)
 	     RTI, RESERVED: num_clks = 3;
 	     ADD, AND, NOT, JMP, LEA : num_clks = 4;
 	     BR, JSR: num_clks = 5;
 	     LD, ST, LDR, STR, TRAP : num_clks = 6;
 		 LDI, STI : num_clks = 8; 
 	  endcase
-
+      
 	  for(int i = 0; i < num_clks; i++) begin 
 	     if (t.reset == 1 && i == t.rst_counter) begin
-	     	lc3if.reset = 1; 
+	     	lc3if.rst = 1; 
 	     	break;
 	     end
-	     if (i == 4) lc3if.cb.data_out = t.data1; 	
-	     if (i == 6) lc3if.cb.data_out = t.data2; 	
+	     if (i == 0) lc3if.cb.data_out <= t.get_instruction(); 	
+	     if (i == 4) lc3if.cb.data_out <= t.data1; 	
+	     if (i == 6) lc3if.cb.data_out <= t.data2; 	
       	@(lc3if.cb); 
 	  end
       @(lc3if.cb); // return to fetch_0 state 
-   endtask
-
-   task transmit(input Transaction t);
-      inst = t.get_instruction();
-      transmit_inst();
    endtask
 
 endclass // Driver
