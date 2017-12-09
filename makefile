@@ -20,8 +20,15 @@ DRIVER_FILES = monitor.sv checker.sv scoreboard.sv driver_cbs.sv driver_cbs_scb.
 ENV_FILES =  generator.sv environment.sv lc3_if.sv
 SVM_FILES = svm_component.sv svm_component_wrapper.sv svm_factory.sv svm_component_reg.sv   
 TEST_FILES = test_base.sv test.sv
-VERILOG_FILES = ${TRANSACTION_FILES} ${COVERAGE_FILES} ${DRIVER_FILES} ${ENV_FILES} ${SVM_FILES} ${TEST_FILES} top.sv	
+TAYLOR_FILES = ./lc3_taylor/datapath.sv ./lc3_taylor/controller.sv ./lc3_taylor/lc3.sv
+NATE_FILES = lc3_nate/lc3.sv
+DUT_FILES = ${NATE_FILES}
+ifeq (${DUT},taylor)
+	DUT_FILES = ${TAYLOR_FILES}
+endif
+VERILOG_FILES = ${TRANSACTION_FILES} ${COVERAGE_FILES} ${DRIVER_FILES} ${ENV_FILES} ${SVM_FILES} ${TEST_FILES} ${DUT_FILES} top.sv	
 TOPLEVEL = top
+
 
 help:
 	@echo "Make targets:"

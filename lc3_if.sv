@@ -11,7 +11,7 @@ interface lc3_if (input bit clk);
 	endclocking
 
 	modport TEST (clocking cb, output rst); // asynch. rst
-	modport DUT (output data_in, addr, memWE, input data_out, rst, clk);
+	modport DUT (output data_in, addr, memWE,ldMAR, input data_out, rst, clk);
 	modport MONITOR (clocking cb); 
 
 endinterface 
