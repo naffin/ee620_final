@@ -11,13 +11,13 @@ class monitor;
 	bit [15:0] reg_file [0:7];
 
 	function new(mailbox #(Transaction) drv2mon, virtual lc3_if.MONITOR lc3if);
-		drv2mon.this = drv2mon;	
+		this.drv2mon = drv2mon;	
 		this.lc3if = lc3if;
 		t = new;
 	endfunction
 
 	task set_states();
-		while() begin
+		while(1) begin
 			@(drv2mon.peek(t));
 			t.addr_access_q = addr_access_q;
 			t.data_in_q = data_in_q;
@@ -27,15 +27,15 @@ class monitor;
 			addr_access_q = {}; 
 			data_in_q = {};
 		end
-	end
+	endtask
 
 	task set_queues();
-		while() begin
+		while(1) begin
 			@(lc3if.cb.memWE);
 			addr_access_q.push_back(lc3if.cb.addr);
 			data_in_q.push_back(lc3if.cb.data_in);
 		end	
-	end
+	endtask
 
 	task run();
 		fork

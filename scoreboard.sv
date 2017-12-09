@@ -1,6 +1,6 @@
 package Scoreboard_pkg;
    import Transaction_pkg::*;
-   import Opcode_pkg;
+   import Opcode_pkg::*;
 class Scoreboard;
    bit [15:0] reg_file [0:7];
    bit [15:0] pc;
@@ -24,7 +24,7 @@ class Scoreboard;
    endtask // run
 
    function void reset_golden();
-      reg_file = '0;
+      for (int i=0; i<8; i=i+1) reg_file[i] = '0;
       pc = 0;
       ir = 0;
       mar = 0;
@@ -32,13 +32,13 @@ class Scoreboard;
       n = 0;
       z = 0;
       p = 0;
-   end
+   endfunction
 
    function bit[15:0] get_alu_src2();
       if(t.imm5_flag)
-	return signed(imm5);
+		return signed'(t.imm5);
       else
-	return reg_file[t.sr1];
+		return reg_file[t.sr1];
    endfunction // get_alu_src2
 
    function void set_dr(bit [15:0] value);
@@ -55,7 +55,7 @@ class Scoreboard;
 
    function void exec_jsr();
       reg_file[7] = pc;
-      pc = (jsr_flag)?signed(PCoffset11):reg_file[t.BaseR];
+      pc = (t.jsr_flag)?signed'(t.PCoffset11):reg_file[t.BaseR];
    endfunction // exec_jsr
 
    function void update_golden();
@@ -68,14 +68,17 @@ class Scoreboard;
       addr_access_q.push_back(pc);
       mar = pc;
       pc++;
-      IR = t.get_instruction();
-      mdr = IR;
+      ir = t.get_instruction();
+      mdr = ir;
    endfunction // update_state_all_ops
 
    function void update_regs_and_flags();
       case(t.opcode)
-	ADD:
-	  set_dr(t.sr1 + get_alu_src2(t));
+	ADD: begin
+		bit [15:0] temp = t.sr1 + get_alu_src2(t);
+	  set_dr(temp);
+	  //set_dr(t.sr1 + get_alu_src2(t));
+		end
 	AND:
 	  set_dr(t.sr1 & get_alu_src2(t));
 	NOT:
@@ -104,15 +107,15 @@ class Scoreboard;
    function void update_mem_access();
       case(t.opcode)
 	LD,ST: begin
-	   addr_access_q.push_back(pc + signed(t.PCoffset9));
-	   mar = pc + signed(t.PCoffset9);
+	   addr_access_q.push_back(pc + signed'(t.PCoffset9));
+	   mar = pc + signed'(t.PCoffset9);
 	end
 	LDR,STR: begin
-	   addr_access_q.push_back(reg_file[t.BaseR] + signed(t.offset6));
-	   mar = reg_file[t.BaseR] + signed(t.offset6);
+	   addr_access_q.push_back(reg_file[t.BaseR] + signed'(t.offset6));
+	   mar = reg_file[t.BaseR] + signed'(t.offset6);
 	end
 	LDI,STI: begin
-	   addr_access_q.push_back(pc + signed(t.PCoffset9));
+	   addr_access_q.push_back(pc + signed'(t.PCoffset9));
 	   addr_access_q.push_back(t.data1);
 	   mar = t.data1;
 	end

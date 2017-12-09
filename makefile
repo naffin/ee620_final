@@ -15,7 +15,7 @@
 ##
 ############################################################################
 TRANSACTION_FILES = opcode.sv transaction.sv
-DRIVER_FILES = scoreboard.sv driver_cbs.sv driver_cbs_scb.sv driver.sv
+DRIVER_FILES = monitor.sv checker.sv scoreboard.sv driver_cbs.sv driver_cbs_scb.sv driver.sv
 ENV_FILES =  generator.sv environment.sv lc3_if.sv
 SVM_FILES = svm_component.sv svm_component_wrapper.sv svm_factory.sv svm_component_reg.sv   
 TEST_FILES = test_base.sv test.sv

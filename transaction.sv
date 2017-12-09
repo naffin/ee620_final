@@ -9,6 +9,7 @@ class Transaction;
 	rand bit [2:0] sr2;
 	rand bit [4:0] imm5;
 	rand bit [8:0] PCoffset9;
+	rand bit [8:0] PCoffset6;
 	rand bit [10:0] PCoffset11;
 	rand bit [5:0] offset6;
 	rand bit [2:0] BaseR;
