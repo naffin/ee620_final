@@ -6,10 +6,10 @@ class Checker;
 	// mailbox from scoreboard to checker
 	mailbox #(Transaction) scb2check;
 	mailbox #(Transaction) mon2check;;
-   Coverage_base cov;
-	function new(Transaction t_scb, t_mon);
-		this.t_scb = t_scb;
-		this.t_mon = t_mon;
+     Coverage_base cov;
+	function new(mailbox #(Transaction) scb2check, mon2check);
+		this.scb2check = scb2check;
+		this.mon2check = mon2check;
 	endfunction
 
 	function void print_addr_queue(Transaction t);
@@ -45,8 +45,8 @@ class Checker;
 
 	task run();
 	   forever begin
-		@(scb2check.get(t_scb));
-		@(mon2check.get(t_mon));
+		scb2check.get(t_scb);
+		mon2check.get(t_mon);
 		compare();
 	      cov.sample(t_mon);
 	   end

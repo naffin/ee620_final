@@ -30,12 +30,25 @@ class Monitor;
 		end
 	endtask
 
-	task set_queues();
+	task get_data_in();
 		while(1) begin
 			@(lc3if.cb.memWE);
-			addr_access_q.push_back(lc3if.cb.addr);
 			data_in_q.push_back(lc3if.cb.data_in);
-		end	
+		end
+	endtask
+
+	task get_addr_access();
+		while(1) begin
+			@(lc3if.cb.ldMAR);
+			addr_access_q.push_back(lc3if.cb.addr);
+		end
+	endtask
+
+	task set_queues();
+		fork
+			get_addr_access();
+			get_data_in();
+		join
 	endtask
 
 	task run();
