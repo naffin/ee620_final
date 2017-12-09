@@ -6,9 +6,9 @@ class Checker;
 	mailbox #(Transaction) scb2check;
 	mailbox #(Transaction) mon2check;;
 
-	function new(Transaction t_scb, t_mon);
-		this.t_scb = t_scb;
-		this.t_mon = t_mon;
+	function new(mailbox #(Transaction) scb2check, mon2check);
+		this.scb2check = scb2check;
+		this.mon2check = mon2check;
 	endfunction
 
 	function void print_addr_queue(Transaction t);
@@ -43,8 +43,8 @@ class Checker;
 	endfunction
 
 	task run();
-		@(scb2check.get(t_scb));
-		@(mon2check.get(t_mon));
+		scb2check.get(t_scb);
+		mon2check.get(t_mon);
 		compare();
 	endtask
 

@@ -22,11 +22,16 @@ class Config;
 endclass : Config
 
 class Environment;
+   virtual lc3_if.TEST lc3if;
    mailbox #(Transaction) gen2drv; 
    Generator gen;
    Driver drv;
    Config cfg;
    Scoreboard scb;
+
+   function new (virtual lc3_if.TEST lc3if)
+      this.lc3if = lc3if;
+   endfunction
 
    function void build();
       // initialize mailbox
@@ -34,7 +39,7 @@ class Environment;
       
       // initialize transactors
       gen = new(gen2drv);
-      drv = new(gen2drv);
+      drv = new(gen2drv, lc3if);
       scb = new();
    endfunction
    

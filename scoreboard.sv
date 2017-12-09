@@ -75,12 +75,10 @@ class Scoreboard;
    function void update_regs_and_flags();
       case(t.opcode)
 	ADD: begin
-		bit [15:0] temp = t.sr1 + get_alu_src2(t);
-	  set_dr(temp);
-	  //set_dr(t.sr1 + get_alu_src2(t));
+	  set_dr(t.sr1 + get_alu_src2());
 		end
 	AND:
-	  set_dr(t.sr1 & get_alu_src2(t));
+	  set_dr(t.sr1 & get_alu_src2());
 	NOT:
 	  set_dr(~t.sr1);
 	BR:
