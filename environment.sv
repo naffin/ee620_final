@@ -22,7 +22,7 @@ class Config;
 endclass : Config
 
 class Environment;
-   mailbox #(Transaction) gen2drv; 
+   mailbox #(Transaction) gen2drv,drv2mon,mon2check,scb2check; 
    Generator gen;
    Driver drv;
    Config cfg;
@@ -31,11 +31,15 @@ class Environment;
    function void build();
       // initialize mailbox
       gen2drv = new(1);
+      drv2mon = new(1);
+      mon2check = new(1);
+      scb2check = new(1);
       
       // initialize transactors
       gen = new(gen2drv);
-      drv = new(gen2drv);
-      scb = new();
+      drv = new(gen2drv,drv2mon);
+      scb = new(scb2check);
+      
    endfunction
    
    task run();

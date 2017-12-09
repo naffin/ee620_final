@@ -5,11 +5,13 @@ package Driver_pkg;
    
 class Driver;
    mailbox #(Transaction) gen2drv;
+   mailbox #(Transaction) drv2mon;
    Driver_cbs cbs[$];
    logic [15:0] inst;
 
-   function new(mailbox #(Transaction) gen2drv);
+   function new(mailbox #(Transaction) gen2drv,mailbox #(Transaction) drv2mon);
       this.gen2drv = gen2drv;
+      this.drv2mon = drv2mon;
    endfunction // new
 
    task run(int num_packets = 100);

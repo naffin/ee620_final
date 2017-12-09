@@ -18,6 +18,8 @@ class Transaction;
 	rand bit jsr_flag;
 	rand bit [15:0] data1, data2;
 	rand bit [2:0] rst_counter;
+   rand bit reset;
+   
 	
 	// state 
 	bit [15:0] reg_file [0:7];

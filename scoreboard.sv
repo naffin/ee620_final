@@ -17,13 +17,13 @@ class Scoreboard;
    endfunction
 
    task process_transaction(ref Transaction t);
+      this.t = t;
       if(t.reset)
 	reset_golden();
       else 
 	 update_golden();
       set_transaction();
       scb2check.put(t);
-      end
    endtask // run
 
    function void update_golden();
@@ -33,7 +33,7 @@ class Scoreboard;
    endfunction // update_state
    
    function void reset_golden();
-      for (int i=0; i<8; i=i+1) reg_file[i] = '0;
+      foreach(reg_file[i]) reg_file[i] = '0;
       pc = 0;
       ir = 0;
       mar = 0;
@@ -95,7 +95,7 @@ class Scoreboard;
 	LDI:
 	  set_dr(t.data2);
 	LEA:
-	  set_dr(pc + PCoffset9);
+	  set_dr(pc + t.PCoffset9);
       endcase
    endfunction // update_state_per_op
 
@@ -137,15 +137,15 @@ class Scoreboard;
       endcase
    endfunction // update_access_q
    
-   function set_transaction();
-      t.reg_file = reg_file;
+   function void set_transaction();
+      foreach(reg_file[i])t.reg_file[i] = reg_file[i];
       t.pc = pc;
       t.ir = ir;
       t.mar = mar;
       t.mdr = mdr;
-      t.n = t.n;
-      t.z = t.z;
-      t.p = t.p;
+      t.n = n;
+      t.z = z;
+      t.p = p;
       t.addr_access_q = addr_access_q;
       t.data_in_q = data_in_q;
    endfunction
