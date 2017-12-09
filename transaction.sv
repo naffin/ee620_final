@@ -26,7 +26,7 @@ class Transaction;
 	bit n, z, p;
 
 	// queues
-	bit [15:0] addr_access_q [$];	
+ 	bit [15:0] addr_access_q [$];	
 	bit [15:0] data_in_q [$];	
 
 	constraint rst_counter_value {
