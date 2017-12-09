@@ -10,7 +10,7 @@ class Driver_cbs_scb extends Driver_cbs;
    endfunction
    
    virtual task post_tx(ref Transaction t);
-      //scb.compare_expected(t);
+      scb.process_transaction(t);
    endtask // post_tx
    
 endclass

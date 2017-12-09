@@ -5,12 +5,15 @@ package Driver_pkg;
    
 class Driver;
    mailbox #(Transaction) gen2drv;
+   mailbox #(Transaction) drv2mon;
    Driver_cbs cbs[$];
    logic [15:0] inst;
    virtual lc3_if.TEST lc3if;
 
-   function new(input mailbox #(Transaction) gen2drv, input virtual lc3_if.TEST lc3if);
+   function new(mailbox #(Transaction) gen2drv,mailbox #(Transaction) drv2mon, 
+				input virtual lc3_if.TEST lc3if);
       this.gen2drv = gen2drv;
+      this.drv2mon = drv2mon;
       this.lc3if = lc3if;
    endfunction // new
 
