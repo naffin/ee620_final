@@ -35,6 +35,38 @@ class Transaction;
 
 	function Transaction copy();
 		copy = new this;	
+	endfunction // copy
+
+	function bit [15:0] get_instruction();
+	   bit [15:0] inst;
+	   inst[15:12] = opcode;
+	   case(opcode)
+	     ADD, AND : begin
+		inst[11:6] = {dr,sr1};
+		inst[5:0] = (imm5_flag)?{1'b1,imm5}:{3'b0,sr2};
+	     end
+	     NOT : 
+	       inst[11:0] = {dr,sr,6'b111111};
+	     BR	: 
+	       inst[11:0] = {n,z,p,PCoffset9}; //TODO : this should be N,Z,P
+	     JMP : 
+	       inst[11:9] = {3'b000,BaseR,6'b000000};
+	     JSR : 
+	       inst[11:0] = (jsr_flag)? {1'b1,PCoffset11}:
+			    {3'b000,BaseR,6'b000000};
+	     LD,LDI,LEA: 
+	       inst[11:9] = {dr,PCoffset9};
+	     LDR:
+	       inst[11:9] = {dr,BaseR,PCoffset6};
+	     ST,STI: 
+	       inst[11:9] = {sr,PCoffset9};
+	     STR:
+	       inst[11:9] = {sr,BaseR,PCoffset6};
+	     TRAP: 
+	       inst[11:0] = {4'b0000,trapvect8};
+	     RTI: 
+	       inst[11:0] = 12'b000000000000;
+	   endcase
 	endfunction
 endclass
 endpackage

@@ -19,10 +19,10 @@ class Scoreboard;
 	return reg_file[t.sr1];
    endfunction // get_alu_src2
 
-   function void set_reg(bit [15:0] value);
+   function void set_dr(bit [15:0] value);
       set_nzp(value);
       reg_file[t.dr] = value;
-   endfunction // set_reg
+   endfunction // set_dr
 
 
    function void set_nzp(bit [15:0] value);
@@ -30,22 +30,65 @@ class Scoreboard;
       z = (value == 0)?1:0;
       p = (value > 0)?1:0;
    endfunction // set_nzp
+
+   function void exec_jsr();
+      reg_file[7] = pc;
+      pc = (jsr_flag)?signed(PCoffset11):reg_file[t.BaseR];
+   endfunction // exec_jsr
+
+   function void update_golden();
+      fetch();
+      exec();
+      mem();
+   endfunction // update_state
    
-   function exec_transaction();
-      adddr_access.push_back(pc);
+   function void fetch();
+      addr_access_q.push_back(pc);
       pc++;
+      IR = t.get_instruction();
+   endfunction // update_state_all_ops
+
+   function void exec();
       case(t.opcode)
 	ADD:
-	  set_reg(t.sr1 + get_alu_src2(t));
+	  set_dr(t.sr1 + get_alu_src2(t));
 	AND:
-	  set_reg(t.sr1 & get_alu_src2(t));
+	  set_dr(t.sr1 & get_alu_src2(t));
 	NOT:
-	  set_reg(~t.sr1);
+	  set_dr(~t.sr1);
 	BR:
-	  set
-	   
+	  if(t.n&n | t.z&z | t.p&p)
+	    pc = pc + t.PCoffset9;
+	JMP:
+	  pc = reg_file[t.BaseR];
+	JSR:
+	  exec_jsr();
+	LD, LDR:
+	  set_dr(t.data1);
+	LDI:
+	  set_dr(t.data2);
+	LEA:
+	  set_dr(pc + PCoffset9);
+      endcase
+   endfunction // update_state_per_op
+
+   function void mem();
+      
+      case(t.opcode)
+	LD,ST:
+	  addr_access_q.push_back(pc + signed(t.PCoffset9));
+	LDR,STR:
+	  addr_access_q.push_back(reg_file[t.BaseR] + signed(t.PCoffset9));
+	LDI,STI: begin
+	  addr_access_q.push_back(pc + signed(t.PCoffset9));
+	  addr_access_q.push_back(t.data1);
 	end
       endcase
+      if(t.opcode inside {ST,STI,STR})
+	t.data_in_q.push_back(reg_file[t.sr]);
+   endfunction // update_access_q
+
+   function void update_data_in_q();
    endfunction
 endclass // Scoreboard
 endpackage
