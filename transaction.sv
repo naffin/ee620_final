@@ -51,18 +51,18 @@ class Transaction;
 	     BR	: 
 	       inst[11:0] = {n,z,p,PCoffset9}; //TODO : this should be N,Z,P
 	     JMP : 
-	       inst[11:9] = {3'b000,BaseR,6'b000000};
+	       inst[11:0] = {3'b000,BaseR,6'b000000};
 	     JSR : 
 	       inst[11:0] = (jsr_flag)? {1'b1,PCoffset11}:
 			    {3'b000,BaseR,6'b000000};
 	     LD,LDI,LEA: 
-	       inst[11:9] = {dr,PCoffset9};
+	       inst[11:0] = {dr,PCoffset9};
 	     LDR:
-	       inst[11:9] = {dr,BaseR,PCoffset6};
+	       inst[11:0] = {dr,BaseR,PCoffset6};
 	     ST,STI: 
-	       inst[11:9] = {sr,PCoffset9};
+	       inst[11:0] = {sr,PCoffset9};
 	     STR:
-	       inst[11:9] = {sr,BaseR,PCoffset6};
+	       inst[11:0] = {sr,BaseR,PCoffset6};
 	     TRAP: 
 	       inst[11:0] = {4'b0000,trapvect8};
 	     RTI: 

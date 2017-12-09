@@ -10,19 +10,28 @@ class Scoreboard;
    bit [15:0] addr_access_q [$];	
    bit [15:0] data_in_q [$];
    Transaction t;
-   mailbox #(Transaction) agt2scb;
+   mailbox #(Transaction) scb2check;
 
-   function new(mailbox #(Transaction) agt2scb);
-      this.agt2scb = agt2scb;
+   function new(mailbox #(Transaction) scb2check);
+      this.scb2check = scb2check;
    endfunction
 
-   task run();
-      reset_golden();
-      forever begin
-	 
+   task process_transaction(ref Transaction t);
+      if(t.reset)
+	reset_golden();
+      else 
+	 update_golden();
+      set_transaction();
+      scb2check.put(t);
       end
    endtask // run
 
+   function void update_golden();
+      fetch();
+      update_regs_and_flags();
+      update_mem();
+   endfunction // update_state
+   
    function void reset_golden();
       for (int i=0; i<8; i=i+1) reg_file[i] = '0;
       pc = 0;
@@ -58,12 +67,6 @@ class Scoreboard;
       pc = (t.jsr_flag)?signed'(t.PCoffset11):reg_file[t.BaseR];
    endfunction // exec_jsr
 
-   function void update_golden();
-      fetch();
-      update_regs_and_flags();
-      update_mem();
-   endfunction // update_state
-   
    function void fetch();
       addr_access_q.push_back(pc);
       mar = pc;
@@ -74,13 +77,10 @@ class Scoreboard;
 
    function void update_regs_and_flags();
       case(t.opcode)
-	ADD: begin
-		bit [15:0] temp = t.sr1 + get_alu_src2(t);
-	  set_dr(temp);
-	  //set_dr(t.sr1 + get_alu_src2(t));
-		end
+	ADD: 
+	  set_dr(t.sr1 + get_alu_src2());
 	AND:
-	  set_dr(t.sr1 & get_alu_src2(t));
+	  set_dr(t.sr1 & get_alu_src2());
 	NOT:
 	  set_dr(~t.sr1);
 	BR:
@@ -125,7 +125,7 @@ class Scoreboard;
    function void update_mem_data();
       case(t.opcode)
 	ST,STI,STR: begin
-	   t.data_in_q.push_back(reg_file[t.sr]);
+	   data_in_q.push_back(reg_file[t.sr]);
 	   mdr = reg_file[t.sr];
 	end
 	LD,LDR:
@@ -136,6 +136,18 @@ class Scoreboard;
 	  mdr = t.get_instruction();
       endcase
    endfunction // update_access_q
-
+   
+   function set_transaction();
+      t.reg_file = reg_file;
+      t.pc = pc;
+      t.ir = ir;
+      t.mar = mar;
+      t.mdr = mdr;
+      t.n = t.n;
+      t.z = t.z;
+      t.p = t.p;
+      t.addr_access_q = addr_access_q;
+      t.data_in_q = data_in_q;
+   endfunction
 endclass // Scoreboard
 endpackage
