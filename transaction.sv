@@ -36,7 +36,6 @@ class Transaction;
 
 	constraint rst_counter_value {
 	   reset dist {0:=9, 1:=1};
-	   opcode inside {[ADD:ST]};
 		// set rst_counter constraints based on the opCode	
 	};
 

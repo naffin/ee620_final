@@ -80,7 +80,7 @@ module controller(lc3_if.DUT lc3if,
 	      state <= STATE_ldi1;
 	    STATE_ldi1:
 	      state <= STATE_ldi2;
-	    STATE_ld2:
+	    STATE_ldi2:
 	      state <= STATE_ldi3;
 	    STATE_ldi3:
 	      state <= STATE_ldi4;

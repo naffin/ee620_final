@@ -18,7 +18,7 @@ package Environment_pkg;
 class Config;
    rand bit [31:0] run_for_n_trans;
    constraint num_trans {
-      run_for_n_trans == 100;
+      run_for_n_trans == 1000;
    }
 endclass : Config
 

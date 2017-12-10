@@ -28,7 +28,7 @@ class Driver;
    	     foreach(cbs[i]) begin
    	        cbs[i].post_tx(t);
    	     end
-	 drv2mon.put(t.copy);
+	 drv2mon.put(t.copy());
    	     gen2drv.get(t);
 	  end
    endtask // run
@@ -42,7 +42,7 @@ class Driver;
 	     ADD, AND, NOT, JMP, LEA : num_clks = 4;
 	     BR, JSR: num_clks = 5;
 	     LD, ST, LDR, STR, TRAP : num_clks = 6;
-		 LDI, STI : num_clks = 8; 
+		 LDI, STI : num_clks = 8;
 	  endcase
 	  for(int i = 0; i < num_clks; i++) begin 
 	     if (t.reset == 1 && i == t.rst_counter) begin
