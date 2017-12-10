@@ -66,11 +66,11 @@ class Scoreboard;
 
    function void exec_jsr();
       reg_file[7] = pc;
-      pc = (t.jsr_flag)?PC + signed'(t.PCoffset11):reg_file[t.BaseR];
+      pc = (t.jsr_flag)?pc + signed'(t.PCoffset11):reg_file[t.BaseR];
    endfunction // exec_jsr
 
    function void exec_trap();
-      ref_file[7] = pc;
+      reg_file[7] = pc;
       pc = t.data1;
    endfunction
 

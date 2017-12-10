@@ -312,7 +312,7 @@ module controller(lc3_if.DUT lc3if,
 	     flagWE = 1'b1;
 	     enaPC = 1'b1;
 	     selMDR = 1'b1;
-	     ldMDR;
+	     ldMDR = 1'b1;
 	  end
 	  STATE_trap2: begin
 	     enaMDR = 1'b1;
