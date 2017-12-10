@@ -30,7 +30,7 @@ class Checker;
 		this.mon2check = mon2check;
 	endfunction
 
-	function void compare();
+	function bit compare();
 	   `CHECKER_COMPARE(pc);
 	   `CHECKER_COMPARE(ir);
 	   `CHECKER_COMPARE(mar);
@@ -45,16 +45,21 @@ class Checker;
 	      t_scb.print();
 	      $display("DUT Transaction:");
 	      t_mon.print();
-	      $finish;
+	      return 0;
 	   end
+	   return 1;
 	endfunction
 
 	task run();
 	   forever begin
 		scb2check.get(t_scb);
 		mon2check.get(t_mon);
-		compare();
-	      cov.sample(t_mon);
+		if(compare())
+		  cov.sample(t_mon);
+		else
+		  break;
+	      if($get_coverage() == 100)
+		break;
 	   end
 	endtask
 

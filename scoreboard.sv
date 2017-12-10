@@ -49,7 +49,7 @@ class Scoreboard;
       if(t.imm5_flag)
 		return signed'(t.imm5);
       else
-		return reg_file[t.sr1];
+		return reg_file[t.sr2];
    endfunction // get_alu_src2
 
    function void set_dr(bit [15:0] value);
@@ -66,8 +66,13 @@ class Scoreboard;
 
    function void exec_jsr();
       reg_file[7] = pc;
-      pc = (t.jsr_flag)?signed'(t.PCoffset11):reg_file[t.BaseR];
+      pc = (t.jsr_flag)?PC + signed'(t.PCoffset11):reg_file[t.BaseR];
    endfunction // exec_jsr
+
+   function void exec_trap();
+      ref_file[7] = pc;
+      pc = t.data1;
+   endfunction
 
    function void fetch();
       addr_access_q ={};
@@ -100,6 +105,8 @@ class Scoreboard;
 	  set_dr(t.data2);
 	LEA:
 	  set_dr(pc + t.PCoffset9);
+	TRAP:
+	  exec_trap();
       endcase
    endfunction // update_state_per_op
 
@@ -123,6 +130,10 @@ class Scoreboard;
 	   addr_access_q.push_back(t.data1);
 	   mar = t.data1;
 	end
+	TRAP: begin
+	   addr_access_q.push_back(16'(t.trapvect8));
+	   mar = 16'(t.trapvect8);
+	end
       endcase // case (t.opcode)
    endfunction // update_queues
    
@@ -132,7 +143,7 @@ class Scoreboard;
 	   data_in_q.push_back(reg_file[t.sr]);
 	   mdr = reg_file[t.sr];
 	end
-	LD,LDR:
+	LD,LDR,TRAP:
 	  mdr = t.data1;
 	LDI:
 	  mdr = t.data2;

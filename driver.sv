@@ -44,7 +44,6 @@ class Driver;
 	     LD, ST, LDR, STR, TRAP : num_clks = 6;
 		 LDI, STI : num_clks = 8; 
 	  endcase
-      
 	  for(int i = 0; i < num_clks; i++) begin 
 	     if (t.reset == 1 && i == t.rst_counter) begin
 	     	lc3if.rst = 1;
@@ -55,6 +54,9 @@ class Driver;
 	     if (i == 6) lc3if.cb.data_out <= t.data2; 	
       	@(lc3if.cb); 
 	  end
+	     if (t.reset == 1 && num_clks == t.rst_counter) begin
+	     	lc3if.rst = 1;
+	     end
       @(lc3if.cb); // return to fetch_0 state 
    endtask
 

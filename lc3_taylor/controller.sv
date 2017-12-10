@@ -20,7 +20,7 @@ module controller(lc3_if.DUT lc3if,
    parameter STATE_lea0=23;
    parameter STATE_sti0=24,STATE_sti1=25,STATE_sti2=26,STATE_sti3=27,STATE_sti4=28;
    parameter STATE_str0=29,STATE_str1=30,STATE_str2=31;
-   parameter STATE_trap0 = 32;
+   parameter STATE_trap0 = 32, STATE_trap1 = 33, STATE_trap2 = 34;
    wire 			   branchEn;
    assign branchEn = ((IR[11]&&N)||(IR[10]&&Z)||(IR[9]&&P));
 
@@ -76,10 +76,38 @@ module controller(lc3_if.DUT lc3if,
 	      state <= STATE_ld1;
 	    STATE_ld1:
 	      state <= STATE_ld2;
+	    STATE_ldi0:
+	      state <= STATE_ldi1;
+	    STATE_ldi1:
+	      state <= STATE_ldi2;
+	    STATE_ld2:
+	      state <= STATE_ldi3;
+	    STATE_ldi3:
+	      state <= STATE_ldi4;
+	    STATE_ldr0:
+	      state <= STATE_ldr1;
+	    STATE_ldr1:
+	      state <= STATE_ldr2;
 	    STATE_st0:
 	      state <= STATE_st1;
 	    STATE_st1:
 	      state <= STATE_st2;
+	    STATE_sti0:
+	      state <= STATE_sti1;
+	    STATE_sti1:
+	      state <= STATE_sti1;
+	    STATE_sti2:
+	      state <= STATE_sti1;
+	    STATE_sti3:
+	      state <= STATE_sti1;
+	    STATE_str0:
+	      state <= STATE_str1;
+	    STATE_str1:
+	      state <= STATE_str2;
+	    STATE_trap0:
+	      state <= STATE_trap1;
+	    STATE_trap1:
+	      state <= STATE_trap2;
 	    default:
 	      //The other states all return here
 	      state <= STATE_fetch0;
@@ -221,15 +249,10 @@ module controller(lc3_if.DUT lc3if,
 	     flagWE  = 1'b1;
 	     enaMDR = 1'b1;
 	  end
-	  STATE_sti0:begin
+	  STATE_st0: begin
 	     selEAB2=2'b10;
 	     enaMARM=1'b1;
 	     ldMAR=1'b1;
-	  end
-	  STATE_st0: begin
-	     selEAB2 = 2'b10;
-	     enaMARM = 1'b1;
-	     ldMAR		= 1'b1;
 	  end
 	  STATE_st1: begin
 	     SR1 	 = IR[11:9];
@@ -239,6 +262,62 @@ module controller(lc3_if.DUT lc3if,
 	  end
 	  STATE_st2: begin
 	     lc3if.memWE = 1'b1;
+	  end
+	  STATE_sti0:begin
+	     selEAB2=2'b10;
+	     enaMARM=1'b1;
+	     ldMAR=1'b1;
+	  end
+	  STATE_sti1:begin
+	     ldMDR = 1'b1;
+	     selMDR = 1'b1;
+	  end
+	  STATE_sti2:begin
+	     ldMAR = 1'b1;
+	     enaMDR = 1'b1;
+	  end
+	  STATE_sti3: begin
+	     SR1 	 = IR[11:9];
+	     selEAB1 = 1'b1;
+	     enaMARM = 1'b1;
+	     ldMDR  = 1'b1;
+	  end
+	  STATE_sti4: begin
+	     lc3if.memWE = 1'b1;
+	  end
+	  STATE_str0: begin
+	     SR1 = IR[8:6];
+	     selEAB1 = 1'b1;
+	     selEAB2 = 2'b01;
+	     enaMARM = 1'b1;
+	     ldMAR = 1'b1;
+	  end
+	  STATE_str1: begin
+	     SR1 	 = IR[11:9];
+	     selEAB1 = 1'b1;
+	     enaMARM = 1'b1;
+	     ldMDR  = 1'b1;
+	  end
+	  STATE_str2: begin
+	     lc3if.memWE = 1'b1;
+	  end
+	  STATE_trap0: begin
+	     selMAR = 1'b1;
+	     enaMARM = 1'b1;
+	     ldMAR    = 1'b1;
+	  end
+	  STATE_trap1: begin
+	     DR    = 3'b111;
+	     regWE = 1'b1;
+	     flagWE = 1'b1;
+	     enaPC = 1'b1;
+	     selMDR = 1'b1;
+	     ldMDR;
+	  end
+	  STATE_trap2: begin
+	     enaMDR = 1'b1;
+	     selPC = 2'b10;
+	     ldPC = 1'b1;
 	  end
 	endcase
      end
