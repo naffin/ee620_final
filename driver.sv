@@ -39,8 +39,8 @@ class Driver;
 
 	  case(t.opcode)
 	     RTI, RESERVED: num_clks = 3;
-	     ADD, AND, NOT, JMP, LEA : num_clks = 4;
-	     BR, JSR: num_clks = 5;
+	     ADD, AND, NOT, JMP, LEA, BR : num_clks = 4;
+	     JSR: num_clks = 5;
 	     LD, ST, LDR, STR, TRAP : num_clks = 6;
 		 LDI, STI : num_clks = 8;
 	  endcase

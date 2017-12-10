@@ -21,6 +21,7 @@ module controller(lc3_if.DUT lc3if,
    parameter STATE_sti0=24,STATE_sti1=25,STATE_sti2=26,STATE_sti3=27,STATE_sti4=28;
    parameter STATE_str0=29,STATE_str1=30,STATE_str2=31;
    parameter STATE_trap0 = 32, STATE_trap1 = 33, STATE_trap2 = 34;
+   parameter STATE_jsrr0 = 35, STATE_jsrr1 = 36;
    wire 			   branchEn;
    assign branchEn = ((IR[11]&&N)||(IR[10]&&Z)||(IR[9]&&P));
 
@@ -47,8 +48,12 @@ module controller(lc3_if.DUT lc3if,
 		  state <= STATE_ld0;
 		4'b0011:
 		  state <= STATE_st0;
-		4'b0100:
-		  state <= STATE_jsr0;
+		4'b0100: begin
+		   if(IR[11])
+		     state <= STATE_jsr0;
+		   else
+		     state <= STATE_jsrr0;
+		end
 		4'b0101:
 		  state <= STATE_alu0;
 		4'b1001:
@@ -72,6 +77,8 @@ module controller(lc3_if.DUT lc3if,
 	      endcase
 	    STATE_jsr0:
 	      state <= STATE_jsr1;
+	    STATE_jsrr0:
+	      state <= STATE_jsrr1;
 	    STATE_ld0:
 	      state <= STATE_ld1;
 	    STATE_ld1:
@@ -95,11 +102,11 @@ module controller(lc3_if.DUT lc3if,
 	    STATE_sti0:
 	      state <= STATE_sti1;
 	    STATE_sti1:
-	      state <= STATE_sti1;
+	      state <= STATE_sti2;
 	    STATE_sti2:
-	      state <= STATE_sti1;
+	      state <= STATE_sti3;
 	    STATE_sti3:
-	      state <= STATE_sti1;
+	      state <= STATE_sti4;
 	    STATE_str0:
 	      state <= STATE_str1;
 	    STATE_str1:
@@ -178,12 +185,21 @@ module controller(lc3_if.DUT lc3if,
 	  STATE_jsr0: begin
 	     DR    = 3'b111;
 	     regWE = 1'b1;
-	     flagWE = 1'b1;
 	     enaPC = 1'b1;
 	  end
 	  STATE_jsr1: begin
 	     selPC   = 2'b01;
 	     selEAB2 = 2'b11;
+	     ldPC    = 1'b1;
+	  end
+	  STATE_jsrr0: begin
+	     DR    = 3'b111;
+	     regWE = 1'b1;
+	     enaPC = 1'b1;
+	  end
+	  STATE_jsrr1: begin
+	     selPC   = 2'b01;
+	     selEAB1 = 1'b1;
 	     ldPC    = 1'b1;
 	  end
 	  STATE_ld0: begin
@@ -247,7 +263,6 @@ module controller(lc3_if.DUT lc3if,
 	     DR     = IR[11:9];
 	     regWE  = 1'b1;
 	     flagWE  = 1'b1;
-	     enaMDR = 1'b1;
 	  end
 	  STATE_st0: begin
 	     selEAB2=2'b10;
@@ -309,7 +324,6 @@ module controller(lc3_if.DUT lc3if,
 	  STATE_trap1: begin
 	     DR    = 3'b111;
 	     regWE = 1'b1;
-	     flagWE = 1'b1;
 	     enaPC = 1'b1;
 	     selMDR = 1'b1;
 	     ldMDR = 1'b1;

@@ -58,8 +58,8 @@ class Checker;
 		  cov.sample(t_mon);
 		else
 		  break;
-	      if($get_coverage() == 100)
-		break;
+	      // if($get_coverage() == 100)
+	      // 	break;
 	   end
 	endtask
 

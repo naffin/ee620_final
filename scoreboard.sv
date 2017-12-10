@@ -66,7 +66,7 @@ class Scoreboard;
 
    function void exec_jsr();
       reg_file[7] = pc;
-      pc = (t.jsr_flag)?pc + signed'(t.PCoffset11):reg_file[t.BaseR];
+      pc = (t.jsr_flag)?pc + 16'(signed'(t.PCoffset11)):reg_file[t.BaseR];
    endfunction // exec_jsr
 
    function void exec_trap();
@@ -91,10 +91,10 @@ class Scoreboard;
 	AND:
 	  set_dr(reg_file[t.sr1] & get_alu_src2());
 	NOT:
-	  set_dr(~reg_file[t.sr1]);
+	  set_dr(~reg_file[t.sr]);
 	BR:
 	  if(t.n&n | t.z&z | t.p&p)
-	    pc = pc + t.PCoffset9;
+	    pc = pc + 16'(signed'(t.PCoffset9));
 	JMP:
 	  pc = reg_file[t.BaseR];
 	JSR:
@@ -104,7 +104,7 @@ class Scoreboard;
 	LDI:
 	  set_dr(t.data2);
 	LEA:
-	  set_dr(pc + t.PCoffset9);
+	  set_dr(pc + 16'(signed'(t.PCoffset9)));
 	TRAP:
 	  exec_trap();
       endcase

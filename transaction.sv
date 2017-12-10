@@ -11,7 +11,6 @@ class Transaction;
 	rand bit [2:0] sr2;
 	rand bit [4:0] imm5;
 	rand bit [8:0] PCoffset9;
-	rand bit [8:0] PCoffset6;
 	rand bit [10:0] PCoffset11;
 	rand bit [5:0] offset6;
 	rand bit [2:0] BaseR;
@@ -79,11 +78,11 @@ class Transaction;
 	     LD,LDI,LEA: 
 	       inst[11:0] = {dr,PCoffset9};
 	     LDR:
-	       inst[11:0] = {dr,BaseR,PCoffset6};
+	       inst[11:0] = {dr,BaseR,offset6};
 	     ST,STI: 
 	       inst[11:0] = {sr,PCoffset9};
 	     STR:
-	       inst[11:0] = {sr,BaseR,PCoffset6};
+	       inst[11:0] = {sr,BaseR,offset6};
 	     TRAP: 
 	       inst[11:0] = {4'b0000,trapvect8};
 	     RTI: 
