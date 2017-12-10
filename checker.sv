@@ -42,9 +42,9 @@ class Checker;
 	   `CHECKER_COMPARE(reg_file);
 	   if(error_flag) begin
 	      $display("Golden Transaction:");
-	      $display("%p",t_scb);
+	      t_scb.print();
 	      $display("DUT Transaction:");
-	      $display("%p",t_mon);
+	      t_mon.print();
 	      $finish;
 	   end
 	endfunction

@@ -25,6 +25,13 @@ class Monitor;
 			t.data_in_q = data_in_q;
 		   end
 		   foreach(t.reg_file[i])t.reg_file[i] = $root.top.dut.dp.reg_file[i];
+		   t.pc = $root.top.dut.dp.PC;
+		   t.ir = $root.top.dut.dp.IR;
+		   t.mar = $root.top.dut.dp.MAR;
+		   t.mdr = $root.top.dut.dp.MDR;
+		   t.n = $root.top.dut.dp.N;
+		   t.z = $root.top.dut.dp.Z;
+		   t.p = $root.top.dut.dp.P;
 			mon2check.put(t);
 			// delete contents in queues
 			addr_access_q = {}; 
@@ -36,21 +43,18 @@ class Monitor;
 
 	task get_data_in();
 		while(1) begin
-		   @(lc3if.cb) begin
-		      if(lc3if.cb.memWE)
-			data_in_q.push_back(lc3if.cb.data_in);
-		   end
+		   @lc3if.cb;
+		   if(lc3if.cb.memWE)
+		     data_in_q.push_back(lc3if.cb.data_in);
 		end
 	endtask
 
 	task get_addr_access();
 		while(1) begin
-		   @(lc3if.cb) begin
-		      
-		      if(lc3if.cb.ldMAR)begin
-			addr_access_q.push_back(lc3if.cb.addr);
-			$display("%pns Queue: %p",$time,addr_access_q);
-		      end
+		   @ lc3if.cb;
+		   if(lc3if.cb.ldMAR)begin
+		      @lc3if.cb;
+		      addr_access_q.push_back(lc3if.cb.addr);
 		   end
 		end
 	endtask

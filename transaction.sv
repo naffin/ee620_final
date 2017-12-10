@@ -2,7 +2,9 @@ package Transaction_pkg;
 	import Opcode_pkg::*;
 class Transaction;
 	// stimulus
-	rand OpCode opcode;
+   static int id_count = 1;
+   int id;
+	rand Opcode opcode;
 	rand bit [2:0] dr;
 	rand bit [2:0] sr;
 	rand bit [2:0] sr1;
@@ -38,8 +40,16 @@ class Transaction;
 		// set rst_counter constraints based on the opCode	
 	};
 
+	function new();
+	   id = id_count++;
+	endfunction // new
+
+	function void post_randomize();
+	   id = id_count++;
+	endfunction
+
 	function Transaction copy();
-		copy = new this;	
+		copy = new this;
 	endfunction // copy
 
 	function bit [15:0] get_instruction();
@@ -73,6 +83,17 @@ class Transaction;
 	       inst[11:0] = 12'b000000000000;
 	   endcase // case (opcode)
 	   return inst;
+	endfunction // get_instruction
+
+	function void print();
+	   $display("\nid:%p, op:%p, reset:%p, rst_counter:%p",id,opcode,reset,rst_counter);
+	   $display("dr:%p, sr:%p, sr1:%p, sr2:%p, imm5:%p, imm5_flag:%p",dr,sr,sr1,sr2,imm5,imm5_flag);
+	   $display("off11:%p, off9:%p, off6:%p, trapvect8:%p",PCoffset11,PCoffset9,offset6,trapvect8);
+	   $display("BaseR:%p,jsr_flag:%p, data1:%p, data2:%p",BaseR,jsr_flag,data1,data2);
+	   $display("reg_file:%p",reg_file);
+	   $display("pc:%p, ir:%h, mar:%h, mdr:%h",pc,ir,mar,mdr);
+	   $display("addr_access_q:%p",addr_access_q);
+	   $display("data_in_q:%p\n",data_in_q);
 	endfunction
 endclass
 endpackage

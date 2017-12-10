@@ -33,6 +33,8 @@ class Scoreboard;
    endfunction // update_state
    
    function void reset_golden();
+      addr_access_q = {};
+      data_in_q = {};
       foreach(reg_file[i]) reg_file[i] = '0;
       pc = 0;
       ir = 0;
@@ -57,9 +59,9 @@ class Scoreboard;
 
 
    function void set_nzp(bit [15:0] value);
-      n = (value < 0)?1:0;
-      z = (value == 0)?1:0;
-      p = (value > 0)?1:0;
+      n = (signed'(value) < 0)?1:0;
+      z = (signed'(value) == 0)?1:0;
+      p = (signed'(value) > 0)?1:0;
    endfunction // set_nzp
 
    function void exec_jsr();
@@ -80,11 +82,11 @@ class Scoreboard;
    function void update_regs_and_flags();
       case(t.opcode)
 	ADD: 
-	  set_dr(t.sr1 + get_alu_src2());
+	  set_dr(reg_file[t.sr1] + get_alu_src2());
 	AND:
-	  set_dr(t.sr1 & get_alu_src2());
+	  set_dr(reg_file[t.sr1] & get_alu_src2());
 	NOT:
-	  set_dr(~t.sr1);
+	  set_dr(~reg_file[t.sr1]);
 	BR:
 	  if(t.n&n | t.z&z | t.p&p)
 	    pc = pc + t.PCoffset9;
@@ -109,15 +111,15 @@ class Scoreboard;
    function void update_mem_access();
       case(t.opcode)
 	LD,ST: begin
-	   addr_access_q.push_back(pc + signed'(t.PCoffset9));
-	   mar = pc + signed'(t.PCoffset9);
+	   addr_access_q.push_back(pc + 16'(signed'(t.PCoffset9)));
+	   mar = pc + 16'(signed'(t.PCoffset9));
 	end
 	LDR,STR: begin
-	   addr_access_q.push_back(reg_file[t.BaseR] + signed'(t.offset6));
-	   mar = reg_file[t.BaseR] + signed'(t.offset6);
+	   addr_access_q.push_back(reg_file[t.BaseR] + 16'(signed'(t.offset6)));
+	   mar = reg_file[t.BaseR] + 16'(signed'(t.offset6));
 	end
 	LDI,STI: begin
-	   addr_access_q.push_back(pc + signed'(t.PCoffset9));
+	   addr_access_q.push_back(pc + 16'(signed'(t.PCoffset9)));
 	   addr_access_q.push_back(t.data1);
 	   mar = t.data1;
 	end

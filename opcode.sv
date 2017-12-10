@@ -16,5 +16,5 @@ package Opcode_pkg;
 		TRAP= 4'b1111,
 		RTI	= 4'b1000,
 		RESERVED = 4'b1101
-	} OpCode;
+	} Opcode;
 endpackage

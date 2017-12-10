@@ -21,7 +21,7 @@ class Generator;
    
    task run();
       blueprint.reset = 1;
-      gen2drv.put(blueprint);
+      gen2drv.put(blueprint.copy());
       forever begin
 	 `SV_RAND_CHECK(blueprint.randomize());
 	 gen2drv.put(blueprint.copy());

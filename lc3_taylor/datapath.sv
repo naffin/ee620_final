@@ -22,12 +22,17 @@ module datapath(lc3if,selEAB1,enaALU,regWE,flagWE,enaMARM,
    integer    i;
        
 
-   always@(posedge lc3if.clk)
-     if(ldMAR)
+   always@(posedge lc3if.clk) begin
+     if(lc3if.rst)
+       MAR <= 0;
+     else if(ldMAR)
        MAR <= bus;
+   end
 
    always@(posedge lc3if.clk)
-     if(ldMDR) begin
+     if(lc3if.rst)
+       MDR <= 0;
+     else if(ldMDR) begin
 	if(selMDR)
 	  MDR <= lc3if.data_out;
 	else
@@ -100,8 +105,11 @@ module datapath(lc3if,selEAB1,enaALU,regWE,flagWE,enaMARM,
 	reg_file[DR] <= bus;
    end
    
-   always@(posedge lc3if.clk)
+   always@(posedge lc3if.clk) begin
+     if(lc3if.rst)
+       IR <= 0;
      if(ldIR)
        IR <= bus;
+   end
 
 endmodule

@@ -233,7 +233,8 @@ module controller(lc3_if.DUT lc3if,
 	  end
 	  STATE_st1: begin
 	     SR1 	 = IR[11:9];
-	     enaALU = 1'b1;
+	     selEAB1 = 1'b1;
+	     enaMARM = 1'b1;
 	     ldMDR  = 1'b1;
 	  end
 	  STATE_st2: begin
