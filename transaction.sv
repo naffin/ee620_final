@@ -40,8 +40,8 @@ class Transaction;
 
    constraint rst_counter_c {
       (opcode inside{RTI,RESERVED}) -> (rst_counter <= 3);
-      (opcode inside{ADD,AND,NOT,JMP,LEA}) -> (rst_counter <= 4);
-      (opcode inside{BR,JSR}) -> (rst_counter <= 5);
+      (opcode inside{ADD,AND,NOT,JMP,LEA,BR}) -> (rst_counter <= 4);
+      (opcode inside{JSR}) -> (rst_counter <= 5);
       (opcode inside{LD,ST,LDR,STR,TRAP}) -> (rst_counter <= 6);
       (opcode inside{LDI,STI}) -> (rst_counter <= 8);
    }

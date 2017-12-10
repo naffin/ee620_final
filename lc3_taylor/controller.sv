@@ -198,6 +198,7 @@ module controller(lc3_if.DUT lc3if,
 	     enaPC = 1'b1;
 	  end
 	  STATE_jsrr1: begin
+	     SR1 = IR[8:6];
 	     selPC   = 2'b01;
 	     selEAB1 = 1'b1;
 	     ldPC    = 1'b1;

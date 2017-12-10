@@ -28,8 +28,8 @@ class Scoreboard;
 
    function void update_golden();
       fetch();
-      update_regs_and_flags();
       update_mem();
+      update_regs_and_flags();
    endfunction // update_state
    
    function void reset_golden();
@@ -66,7 +66,7 @@ class Scoreboard;
 
    function void exec_jsr();
       reg_file[7] = pc;
-      pc = (t.jsr_flag)?pc + 16'(signed'(t.PCoffset11)):reg_file[t.BaseR];
+      pc = (t.jsr_flag == 1'b1)?pc + 16'(signed'(t.PCoffset11)):reg_file[t.BaseR];
    endfunction // exec_jsr
 
    function void exec_trap();
