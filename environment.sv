@@ -18,7 +18,7 @@ package Environment_pkg;
 class Config;
    rand bit [31:0] run_for_n_trans;
    constraint num_trans {
-      run_for_n_trans == 1000;
+      run_for_n_trans == 10;
    }
 endclass : Config
 
@@ -49,11 +49,11 @@ class Environment;
    
    task run();
       fork
-	 gen.run();
+	 gen.run(cfg.run_for_n_trans);
 	 drv.run();
 	 mon.run();
 	 check.run();
-      join
+      join_any
    endtask // run
 
    function void gen_cfg();
@@ -62,9 +62,8 @@ class Environment;
    endfunction
    
    task wrap_up();
-      //$display("Number of transactions sent: %0d", scb.num_compared);
-      $display("Wrap_up called");
-	endtask
+      $display("Number of transactions sent: %0d", Transaction::trans_count);
+   endtask
 endclass
 endpackage
 

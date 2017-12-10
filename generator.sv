@@ -19,10 +19,11 @@ class Generator;
    endfunction 
 
    
-   task run();
+   task run(int num_trans);
       blueprint.reset = 1;
       gen2drv.put(blueprint.copy());
       forever begin
+	 $display("Tran count %p",Transaction::trans_count);
 	 `SV_RAND_CHECK(blueprint.randomize());
 	 gen2drv.put(blueprint.copy());
       end

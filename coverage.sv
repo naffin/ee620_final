@@ -17,8 +17,6 @@ class Coverage extends Coverage_base;
    function void sample(Transaction t);
       this.t = t;
       cov.sample();
-      if($get_coverage == 100)
-	$finish;
    endfunction
 endclass // Coverage
 endpackage // Coverage_pkg

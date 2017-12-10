@@ -2,7 +2,7 @@ package Transaction_pkg;
 	import Opcode_pkg::*;
 class Transaction;
 	// stimulus
-   static int id_count = 1;
+   static int trans_count = 0;
    int id;
 	rand Opcode opcode;
 	rand bit [2:0] dr;
@@ -19,7 +19,7 @@ class Transaction;
 	rand bit imm5_flag;
 	rand bit jsr_flag;
 	rand bit [15:0] data1, data2;
-	rand bit [2:0] rst_counter;
+	rand int unsigned rst_counter;
    rand bit reset;
    
 	
@@ -40,12 +40,20 @@ class Transaction;
 		// set rst_counter constraints based on the opCode	
 	};
 
+   constraint rst_counter_c {
+      (opcode inside{RTI,RESERVED}) -> (rst_counter <= 3);
+      (opcode inside{ADD,AND,NOT,JMP,LEA}) -> (rst_counter <= 4);
+      (opcode inside{BR,JSR}) -> (rst_counter <= 5);
+      (opcode inside{LD,ST,LDR,STR,TRAP}) -> (rst_counter <= 6);
+      (opcode inside{LDI,STI}) -> (rst_counter <= 8);
+   }
+
 	function new();
-	   id = id_count++;
+	   id = ++trans_count;
 	endfunction // new
 
 	function void post_randomize();
-	   id = id_count++;
+	   id = ++trans_count;
 	endfunction
 
 	function Transaction copy();

@@ -108,7 +108,7 @@ module datapath(lc3if,selEAB1,enaALU,regWE,flagWE,enaMARM,
    always@(posedge lc3if.clk) begin
      if(lc3if.rst)
        IR <= 0;
-     if(ldIR)
+     else if(ldIR)
        IR <= bus;
    end
 
