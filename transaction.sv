@@ -33,6 +33,8 @@ class Transaction;
 	bit [15:0] data_in_q [$];	
 
 	constraint rst_counter_value {
+	   reset dist {0:=9, 1:=1};
+	   opcode inside {[ADD:ST]};
 		// set rst_counter constraints based on the opCode	
 	};
 
@@ -69,7 +71,8 @@ class Transaction;
 	       inst[11:0] = {4'b0000,trapvect8};
 	     RTI: 
 	       inst[11:0] = 12'b000000000000;
-	   endcase
+	   endcase // case (opcode)
+	   return inst;
 	endfunction
 endclass
 endpackage

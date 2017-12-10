@@ -19,13 +19,12 @@ class Generator;
    endfunction 
 
    
-   task run(int num_packets = 100);
-      repeat(num_packets) begin
-	 Transaction blueprint_copy;
+   task run();
+      blueprint.reset = 1;
+      gen2drv.put(blueprint);
+      forever begin
 	 `SV_RAND_CHECK(blueprint.randomize());
-	 if(!$cast(blueprint_copy,blueprint.copy()))
-	   $display("Error in casting blueprint to Transaction class");
-	 gen2drv.put(blueprint_copy);
+	 gen2drv.put(blueprint.copy());
       end
    endtask
 endclass // Generator

@@ -1,3 +1,18 @@
+`define CHECKER_COMPARE(member) \
+  do begin\
+     if(t_scb.member != t_mon.member) begin \
+	string str = `"member`"; \
+	$display("%0tns ERROR with %p",$time,str); \
+	$display("Expected:"); \
+	$display("%p",t_scb.member); \
+	$display("Actual:"); \
+	$display("%p",t_mon.member); \
+        error_flag = 1; \
+     end \
+  end while(0)
+	
+       
+
 package Checker_pkg;
 	import Transaction_pkg::*;
    import Coverage_base_pkg::*;
@@ -5,42 +20,33 @@ class Checker;
 	Transaction t_scb, t_mon;
 	// mailbox from scoreboard to checker
 	mailbox #(Transaction) scb2check;
-	mailbox #(Transaction) mon2check;;
+	mailbox #(Transaction) mon2check;
+   bit 		error_flag = 0;
+   
+   
      Coverage_base cov;
 	function new(mailbox #(Transaction) scb2check, mon2check);
 		this.scb2check = scb2check;
 		this.mon2check = mon2check;
 	endfunction
 
-	function void print_addr_queue(Transaction t);
-		foreach(t.addr_access_q[i])
-			$display(t.addr_access_q[i]);
-	endfunction
-
-	function void print_data_in_queue(Transaction t);
-		foreach(t.data_in_q[i])
-			$display(t.data_in_q[i]);
-	endfunction
-
 	function void compare();
-		if(t_scb.addr_access_q.size() != t_mon.addr_access_q.size()) begin
-			$display("0%t ERROR: address access queue sizes don't match",$time);
-			$display("Expected:");
-			print_addr_queue(t_scb);
-			$display("Actual:");
-			print_addr_queue(t_mon);
-		end
-		else begin
-			foreach(t_scb.addr_access_q[i]) begin
-				if(t_scb.addr_access_q[i] != t_mon.addr_access_q[i]); begin
-					$display("0%t ERROR: address access incorrect",$time);
-					$display("Expected:");
-					print_addr_queue(t_scb);
-					$display("Actual:");
-					print_addr_queue(t_mon);
-				end
-			end
-		end
+	   `CHECKER_COMPARE(pc);
+	   `CHECKER_COMPARE(ir);
+	   `CHECKER_COMPARE(mar);
+	   `CHECKER_COMPARE(mdr);
+	   `CHECKER_COMPARE(n);
+	   `CHECKER_COMPARE(z);
+	   `CHECKER_COMPARE(p);
+	   `CHECKER_COMPARE(addr_access_q);
+	   `CHECKER_COMPARE(reg_file);
+	   if(error_flag) begin
+	      $display("Golden Transaction:");
+	      $display("%p",t_scb);
+	      $display("DUT Transaction:");
+	      $display("%p",t_mon);
+	      $finish;
+	   end
 	endfunction
 
 	task run();

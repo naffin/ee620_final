@@ -19,8 +19,8 @@ class Driver;
    endfunction // new
 
    task run();
-      gen2drv.peek(t);
       while(1) begin
+	 gen2drv.peek(t);
    	     foreach(cbs[i]) begin
    	        cbs[i].pre_tx(t);
    	     end
@@ -28,12 +28,14 @@ class Driver;
    	     foreach(cbs[i]) begin
    	        cbs[i].post_tx(t);
    	     end
+	 drv2mon.put(t.copy);
    	     gen2drv.get(t);
 	  end
    endtask // run
 
    task transmit();
 	  int num_clks = 0;
+      lc3if.rst = 0;
 
 	  case(t.opcode)
 	     RTI, RESERVED: num_clks = 3;
@@ -45,7 +47,7 @@ class Driver;
       
 	  for(int i = 0; i < num_clks; i++) begin 
 	     if (t.reset == 1 && i == t.rst_counter) begin
-	     	lc3if.rst = 1; 
+	     	lc3if.rst = 1;
 	     	break;
 	     end
 	     if (i == 0) lc3if.cb.data_out <= t.get_instruction(); 	

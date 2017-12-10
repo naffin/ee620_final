@@ -68,6 +68,8 @@ class Scoreboard;
    endfunction // exec_jsr
 
    function void fetch();
+      addr_access_q ={};
+      data_in_q ={};
       addr_access_q.push_back(pc);
       mar = pc;
       pc++;

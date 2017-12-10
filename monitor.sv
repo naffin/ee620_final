@@ -20,27 +20,38 @@ class Monitor;
 	task set_states();
 		while(1) begin
 			drv2mon.get(t);
+		   if(!t.reset) begin
 			t.addr_access_q = addr_access_q;
 			t.data_in_q = data_in_q;
-			//t.reg_file = $root.top.DUT.reg_file;
+		   end
+		   foreach(t.reg_file[i])t.reg_file[i] = $root.top.dut.dp.reg_file[i];
 			mon2check.put(t);
 			// delete contents in queues
 			addr_access_q = {}; 
 			data_in_q = {};
 		end
-	endtask
+	endtask // set_states
+
+   
 
 	task get_data_in();
 		while(1) begin
-			@(lc3if.cb.memWE);
+		   @(lc3if.cb) begin
+		      if(lc3if.cb.memWE)
 			data_in_q.push_back(lc3if.cb.data_in);
+		   end
 		end
 	endtask
 
 	task get_addr_access();
 		while(1) begin
-			@(lc3if.cb.ldMAR);
+		   @(lc3if.cb) begin
+		      
+		      if(lc3if.cb.ldMAR)begin
 			addr_access_q.push_back(lc3if.cb.addr);
+			$display("%pns Queue: %p",$time,addr_access_q);
+		      end
+		   end
 		end
 	endtask
 

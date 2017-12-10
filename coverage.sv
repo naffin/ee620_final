@@ -7,7 +7,12 @@ class Coverage extends Coverage_base;
    covergroup cov;
       all_ops: coverpoint t.opcode;
 
-   endgroup
+   endgroup // cov
+
+   function new();
+      cov = new();
+   endfunction
+      
       
    function void sample(Transaction t);
       this.t = t;
