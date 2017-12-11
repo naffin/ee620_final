@@ -39,11 +39,69 @@ class Coverage extends Coverage_base;
       sr_cross: cross sr,sr_ops;
       BaseR_cross: cross BaseR,BaseR_ops;
    endgroup // all_instruction_regs
+
+   covergroup reset_all_cycles();
+      ops_3_cycles: coverpoint t.opcode{
+	 bins ops_3_cycles[] = {RTI,RESERVED};
+	 option.weight=0;
+      }
+      ops_4_cycles: coverpoint t.opcode{
+	 bins ops_4_cycles[] = {ADD,AND,NOT,JMP,LEA,BR};
+	 option.weight=0;
+      }
+      ops_5_cycles: coverpoint t.opcode{
+	 bins ops_5_cycles[] = {JSR};
+	 option.weight=0;
+      }
+      ops_6_cycles: coverpoint t.opcode{
+	 bins ops_6_cycles[] = {LD,ST,LDR,STR,TRAP};
+	 option.weight=0;
+      }
+      ops_8_cycles: coverpoint t.opcode{
+	 bins ops_8_cycles[] = {LDI,STI};
+	 option.weight=0;
+      }
+
+      rst_counter_3: coverpoint t.rst_counter{
+	 bins rst_counter_3[] = {[0:3]};
+	 option.weight=0;
+      }
+      rst_counter_4: coverpoint t.rst_counter{
+	 bins rst_counter_4[] = {[0:4]};
+	 option.weight=0;
+      }
+      rst_counter_5: coverpoint t.rst_counter{
+	 bins rst_counter_5[] = {[0:5]};
+	 option.weight=0;
+      }
+      rst_counter_6: coverpoint t.rst_counter{
+	 bins rst_counter_6[] = {[0:6]};
+	 option.weight=0;
+      }
+      rst_counter_8: coverpoint t.rst_counter{
+	 bins rst_counter_8[] = {[0:8]};
+	 option.weight=0;
+      }
+
+      rst_3_cross: cross ops_3_cycles,rst_counter_3;
+      rst_4_cross: cross ops_4_cycles,rst_counter_4;
+      rst_5_cross: cross ops_5_cycles,rst_counter_5;
+      rst_6_cross: cross ops_6_cycles,rst_counter_6;
+      rst_8_cross: cross ops_8_cycles,rst_counter_8;
+   endgroup // reset_all_cycles
+
+   covergroup consecutive_ops(); //Needs to be non reset transaction back to back
+      consecutive_opc: coverpoint t.opcode{
+	 bins consecutive_ops[] = ([0:$] => [0:$]);
+      }
+   endgroup
    
 
    function new();
       all_ops = new();
       all_instruction_regs = new();
+      reset_all_cycles = new();
+      consecutive_ops = new();
    endfunction
       
       
@@ -52,6 +110,10 @@ class Coverage extends Coverage_base;
       if(!t.reset) begin
 	 all_ops.sample();
 	 all_instruction_regs.sample();
+	 consecutive_ops.sample();
+      end
+      if(t.reset) begin
+	 reset_all_cycles.sample();
       end
    endfunction
 endclass // Coverage
