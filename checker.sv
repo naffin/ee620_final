@@ -55,11 +55,11 @@ class Checker;
 		scb2check.get(t_scb);
 		mon2check.get(t_mon);
 		if(compare())
-		  cov.sample(t_mon);
+		   cov.sample(t_mon);
 		else
 		  break;
-	      // if($get_coverage() == 100)
-	      // 	break;
+	      if($get_coverage() == 100)
+	      	break;
 	   end
 	endtask
 
