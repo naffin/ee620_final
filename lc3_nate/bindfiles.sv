@@ -1,3 +1,3 @@
 module bindfiles;
-	bind top lc3_asserts p1 (.*);
+	bind lc3 lc3_asserts p1 (.*);
 endmodule

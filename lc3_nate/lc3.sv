@@ -1,12 +1,7 @@
 // data path verilog
 //
 
-module top(
-	input rst, clk, 
-	input [15:0] memOut, 
-	output reg [15:0] mar_reg, mdr_reg,
-	output reg  memWE, ldMAR
-	);
+module lc3(lc3_if.DUT lc3if);
 	reg enaMARM, enaPC, enaMDR, enaALU,
 	  flagWE, ldIR, ldPC, selEAB1,
 	  selMAR, regWE;
@@ -14,14 +9,21 @@ module top(
 	reg [2:0] DR, SR1, SR2;
 	reg [1:0] ALUctrl;	
 	wire N, Z, P, TB;
-	wire [15:0] eabOut, Ra, Rb;
+	wire [15:0] eabOut, Ra, Rb, Buss;
 	wire [15:0] PCOut, ALUOut;
 	wire [15:0] IR, MARMUXOut, mdrOut;
 	wire [7:0] zext;
 	reg selMDR, ldMDR;
+	wire rst, clk;
+	logic [15:0] MDR, MAR;
 
 	assign zext =  {{8{IR[7]}}, IR[7:0]};
 	assign MARMUXOut = (selMAR) ? zext : eabOut;
+
+	assign rst = lc3if.rst;
+	assign rst = lc3if.clk;
+	assign lc3if.addr= MAR;
+	assign lc3if.data_in = MDR;
 
 	pc pc_1 (.*);
 	eab eab_1(.IR(IR[10:0]), .PC(PCOut), .*);
@@ -141,13 +143,14 @@ module top(
 
 
   always @(posedge clk) begin
-    if (rst == 1'b1) 										   
-			mdr_reg <= '0; 
-		mar_reg <= '0;
+    if (rst == 1'b1) begin 
+		MDR  <= '0; 
+		MAR <= '0;
+	end
 	else if (ldMDR)
-	    mdr_reg <=    selMDR ? memOut : Buss;
-	else if (ldMAR)
-	    mar_reg <=    Buss;
+	    MDR <=    selMDR ? lc3if.data_out : Buss;
+	else if (lc3if.ldMAR)
+	    MAR <=    Buss;
   end
 	
 	//----------------Sequential Logic--------------------
@@ -163,7 +166,7 @@ module top(
 	always @ (state) begin
 		if (rst == 1'b1) begin
 			enaPC <= 1'b0;
-			ldMAR <= 1'b0;
+			lc3if.ldMAR <= 1'b0;
 			ldPC  <= 1'b0;
 			ldMDR <= 1'b0;
 			enaMDR <= 1'b0;
@@ -176,7 +179,7 @@ module top(
 		else begin
 		// reset signals
 		enaPC <= 1'b0;
-		ldMAR <= 1'b0;
+		lc3if.ldMAR <= 1'b0;
 		ldPC  <= 1'b0;
 		ldMDR <= 1'b0;
 		enaMDR <= 1'b0;
@@ -184,14 +187,14 @@ module top(
 		enaALU <= 1'b0;
 		enaMARM <= 1'b0;	
 		regWE <= 1'b0;
-		memWE <= 1'b0;
+		lc3if.memWE <= 1'b0;
 		  unique case(state)
 			IDLE : 	begin
 					// nothing here
 				end
 	   		FET0:  	begin
 					enaPC <= 1'b1;
-					ldMAR <= 1'b1;
+					lc3if.ldMAR <= 1'b1;
 				end
 	   		FET1:  	begin
 					selPC <= 2'b00;
@@ -238,7 +241,7 @@ module top(
 					selEAB1 <= 1'b0;  	// load in current PC
 					selMAR <= 1'b0; 	// select output of PC+PCoffset9 to drive Buss
 					enaMARM <= 1'b1;	
-					ldMAR <= 1'b1;
+					lc3if.ldMAR <= 1'b1;
 				end
 			LD1:begin
 					// write data from memory to MDR reg
@@ -253,7 +256,7 @@ module top(
 					flagWE <= 1'b1;	
 				end
 			LDI0_STI0:begin // MAR <- PC+off9
-					ldMAR <= 1'b1;
+					lc3if.ldMAR <= 1'b1;
 					enaMARM <= 1'b1;
 					selEAB2 <= 2'b10;
 					selEAB1 <= 1'b0;
@@ -263,14 +266,14 @@ module top(
 					ldMDR <= 1'b1;
 				end
 			LDI2_STI2:begin // MAR <- MDR 
-					ldMAR <= 1'b1;
+					lc3if.ldMAR <= 1'b1;
 					enaMDR<= 1'b1;
 				end
 			LDR0_STR0:begin // MAR <- MDR 
 					selEAB2 <= 2'b01;	
 					selPC <= 1'b1;	
 					enaMARM <= 1'b1;
-					ldMAR<= 1'b1;
+					lc3if.ldMAR<= 1'b1;
 				end
 			ST1:begin
 					// write data from regfile to memory
@@ -281,7 +284,7 @@ module top(
 					SR1 <= IR[11:9];
 				end
 			ST2:begin
-					memWE <= 1'b1;
+					lc3if.memWE <= 1'b1;
 				end
 			BR0:begin
 					selPC <= 2'b01;
@@ -316,7 +319,7 @@ module top(
 			TRAP0:begin 
 					enaMARM <= 1'b1;
 					selMAR <= 1'b1;
-					ldMAR <= 1'b1;
+					lc3if.ldMAR <= 1'b1;
 				end
 			TRAP1:begin 
 					selMDR <= 1'b1;		// sel data from memory

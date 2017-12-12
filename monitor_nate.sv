@@ -24,14 +24,14 @@ class Monitor;
 			t.addr_access_q = addr_access_q;
 			t.data_in_q = data_in_q;
 		   end
-		   foreach(t.reg_file[i])t.reg_file[i] = $root.top.dut.dp.reg_file[i];
-		   t.pc = $root.top.dut.dp.PC;
-		   t.ir = $root.top.dut.dp.IR;
-		   t.mar = $root.top.dut.dp.MAR;
-		   t.mdr = $root.top.dut.dp.MDR;
-		   t.n = $root.top.dut.dp.N;
-		   t.z = $root.top.dut.dp.Z;
-		   t.p = $root.top.dut.dp.P;
+		   foreach(t.reg_file[i])t.reg_file[i] = $root.top.dut.regfile.regfile[i];
+		   t.pc = $root.top.dut.PCOut;
+		   t.ir = $root.top.dut.IR;
+		   t.mar = $root.top.lc3if.addr;
+		   t.mdr = $root.top.lc3if.data_in;
+		   t.n = $root.top.dut.N;
+		   t.z = $root.top.dut.Z;
+		   t.p = $root.top.dut.P;
 			mon2check.put(t);
 			// delete contents in queues
 			addr_access_q = {}; 
