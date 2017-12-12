@@ -17,7 +17,7 @@ class Monitor;
 		t = new;
 	endfunction
 
-	task set_states();
+	virtual task set_states();
 		while(1) begin
 			drv2mon.get(t);
 		   if(!t.reset) begin

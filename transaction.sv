@@ -34,7 +34,7 @@ class Transaction;
 	bit [15:0] data_in_q [$];	
 
 	constraint rst_counter_value {
-	   reset dist {0:=9, 1:=1};
+	   reset dist {0:=99, 1:=1};
 		// set rst_counter constraints based on the opCode	
 	};
 
