@@ -1,19 +1,3 @@
-############################################################################
-## Purpose: Makefile for Chap_6_Randomization/homework_solution
-## Author: Chris Spear
-##
-## REVISION HISTORY:
-## $Log: Makefile,v $
-## Revision 1.1  2011/05/29 19:10:04  tumbush.tumbush
-## Check into cloud repository
-##
-## Revision 1.2  2011/03/20 20:16:58  Greg
-## Fixed path of Makefile
-##
-## Revision 1.1  2011/03/20 19:09:52  Greg
-## Initial check in
-##
-############################################################################
 TRANSACTION_FILES = opcode.sv transaction.sv assert_macros.sv
 COVERAGE_FILES = coverage_base.sv coverage.sv
 DRIVER_FILES = checker.sv scoreboard.sv driver_cbs.sv driver_cbs_scb.sv driver.sv
@@ -28,12 +12,19 @@ ifeq (${DUT},taylor)
 endif
 VERILOG_FILES = ${TRANSACTION_FILES} ${COVERAGE_FILES} ${DUT_FILES} ${DRIVER_FILES} ${ENV_FILES} ${SVM_FILES} ${TEST_FILES} top.sv	
 TOPLEVEL = top bindfiles
+NUM_TRANS = 0
+PLUS_ARGS = +TESTNAME=${TESTNAME} +NUM_TRANS=${NUM_TRANS}
+QUESTA_OPTS = -novopt -t ns
+GUI_OPTS = -classdebug -do "view wave;do wave.do;"
+BATCH_OPTS = -c -do "coverage save -onexit ${TESTNAME}_${NUM_TRANS}.ucdb;run -all"
 
 
 help:
 	@echo "Make targets:"
-	@echo "> make questa_gui   	# Compile and run with Questa in GUI mode"
-	@echo "> make questa_batch 	# Compile and run with Questa in batch mode"
+	@echo "> make questa_gui TEST_NAME=\"<Test_name>\" [DUT=<name>] [NUM_TRANS=<value> unbounded if ommited]"
+	@echo ""
+	@echo "> make questa_batch TEST_NAME=\"<Test_name>\" [DUT=<name>] [NUM_TRANS=<value> unbounded if ommited]"
+	@echo ""
 	@echo "> make clean        	# Clean up all intermediate files"
 	@echo "> make tar          	# Create a tar file for the current directory"
 	@echo "> make help         	# This message"
@@ -53,10 +44,10 @@ simv:   ${VERILOG_FILES} clean
 #############################################################################
 # Questa section
 questa_gui: work
-	vsim +TESTNAME=${TESTNAME} -novopt -classdebug -t ns -do "view wave;do wave.do;run -all" ${TOPLEVEL}
+	vsim ${PLUS_ARGS} ${QUESTA_OPTS} ${GUI_OPTS} ${TOPLEVEL}
 
 questa_batch: work
-	vsim +TESTNAME=${TESTNAME} -c -novopt -t ns -do "run -all" ${TOPLEVEL}
+	vsim ${PLUS_ARGS} ${QUESTA_OPTS} ${BATCH_OPTS} ${TOPLEVEL}
 
 work: ${VERILOG_FILES}
 	vlib work

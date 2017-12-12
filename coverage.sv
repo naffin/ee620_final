@@ -97,8 +97,67 @@ class Coverage extends Coverage_base;
       }
    endgroup // consecutive_ops
 
+   covergroup offsets_and_imm5();
+      imm5_ops: coverpoint t.opcode{
+	 bins imm5_ops[] = {ADD,AND} iff (t.imm5_flag);
+	 option.weight = 0;
+      }
+      offset9_ops: coverpoint t.opcode{
+	 bins offset9_ops[] = {BR,LD,LDI,LEA,ST,STI};
+	 option.weight = 0;
+      }
+      offset11_ops: coverpoint t.opcode{
+	 bins offset11_ops = {JSR} iff (t.jsr_flag);
+	 option.weight = 0;
+      }
+      offset6_ops: coverpoint t.opcode{
+	 bins offset6_ops[] = {LDR,STR};
+	 option.weight = 0;
+      }
+      trapvect8_ops: coverpoint t.opcode{
+	 bins trapvect8_ops = {TRAP};
+	 option.weight = 0;
+      }
+      imm5: coverpoint t.imm5 {
+	 option.auto_bin_max = num_reg_value_bins;
+	 option.weight = 0;
+      }
+      offset9: coverpoint t.PCoffset9 {
+	 option.auto_bin_max = num_reg_value_bins;
+	 option.weight = 0;
+      }
+      offset11: coverpoint t.PCoffset11 {
+	 option.auto_bin_max = num_reg_value_bins;
+	 option.weight = 0;
+      }
+      offset6: coverpoint t.offset6 {
+	 option.auto_bin_max = num_reg_value_bins;
+	 option.weight = 0;
+      }
+      trapvect8: coverpoint t.trapvect8 {
+	 option.auto_bin_max = num_reg_value_bins;
+	 option.weight = 0;
+      }
+
+      imm5_cross: cross imm5_ops,imm5;
+      offset9_cross: cross offset9_ops,offset9;
+      offset11_cross: cross offset11_ops,offset11;
+      offset6_cross: cross offset6_ops,offset6;
+      trapvect8_cross: cross trapvect8_ops,trapvect8;
+   endgroup
+
    covergroup values_in_regs();
       pc_values: coverpoint t.pc{option.auto_bin_max=num_reg_value_bins;}
+      mar_values: coverpoint t.mar{option.auto_bin_max=num_reg_value_bins;}
+      mdrMDR_values: coverpoint t.mdr{option.auto_bin_max=num_reg_value_bins;}
+      reg_file_0: coverpoint t.reg_file[0]{option.auto_bin_max=num_reg_value_bins;}
+      reg_file_1: coverpoint t.reg_file[1]{option.auto_bin_max=num_reg_value_bins;}
+      reg_file_2: coverpoint t.reg_file[2]{option.auto_bin_max=num_reg_value_bins;}
+      reg_file_3: coverpoint t.reg_file[3]{option.auto_bin_max=num_reg_value_bins;}
+      reg_file_4: coverpoint t.reg_file[4]{option.auto_bin_max=num_reg_value_bins;}
+      reg_file_5: coverpoint t.reg_file[5]{option.auto_bin_max=num_reg_value_bins;}
+      reg_file_6: coverpoint t.reg_file[6]{option.auto_bin_max=num_reg_value_bins;}
+      reg_file_7: coverpoint t.reg_file[7]{option.auto_bin_max=num_reg_value_bins;}
    endgroup // values_in_regs
 
    bit [2:0] nzp_regs;
@@ -119,6 +178,7 @@ class Coverage extends Coverage_base;
       consecutive_ops = new();
       values_in_regs = new();
       br_control = new();
+      offsets_and_imm5 = new();
    endfunction
       
       
@@ -131,6 +191,7 @@ class Coverage extends Coverage_base;
 	 all_instruction_regs.sample();
 	 consecutive_ops.sample();
 	 br_control.sample();
+	 offsets_and_imm5.sample();
       end
       if(t.reset) begin
 	 reset_all_cycles.sample();

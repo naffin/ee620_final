@@ -22,10 +22,16 @@ class Generator;
    task run(int num_trans);
       blueprint.reset = 1;
       gen2drv.put(blueprint.copy());
-      repeat(num_trans - 2) begin
-	 `SV_RAND_CHECK(blueprint.randomize());
-	 gen2drv.put(blueprint.copy());
-      end
+      if(num_trans == 0) 
+	 forever begin
+	    `SV_RAND_CHECK(blueprint.randomize());
+	    gen2drv.put(blueprint.copy());
+	 end
+      else
+	 repeat(num_trans - 2) begin
+	    `SV_RAND_CHECK(blueprint.randomize());
+	    gen2drv.put(blueprint.copy());
+	 end
    endtask
 endclass // Generator
    
