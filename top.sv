@@ -4,5 +4,5 @@ module top;
 
 	lc3_if lc3if (clk);
    	test tb();
-   lc3 dut(lc3if);
+    lc3 dut(lc3if);
 endmodule
