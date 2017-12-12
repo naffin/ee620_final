@@ -2,8 +2,10 @@
 //
 
 module top(
-	inout [15:0] Buss,
-	input rst, clk
+	input rst, clk, 
+	input [15:0] memOut, 
+	output reg [15:0] mar_reg, mdr_reg,
+	output reg  memWE, ldMAR
 	);
 	reg enaMARM, enaPC, enaMDR, enaALU,
 	  flagWE, ldIR, ldPC, selEAB1,
@@ -16,7 +18,7 @@ module top(
 	wire [15:0] PCOut, ALUOut;
 	wire [15:0] IR, MARMUXOut, mdrOut;
 	wire [7:0] zext;
-	reg selMDR, ldMDR, ldMAR, memWE;
+	reg selMDR, ldMDR;
 
 	assign zext =  {{8{IR[7]}}, IR[7:0]};
 	assign MARMUXOut = (selMAR) ? zext : eabOut;
@@ -28,7 +30,6 @@ module top(
 	nzp nzp_1 (.*);
 	alu alu_1(.IR(IR[4:0]), .IR_5(IR[5]), .*);
 	ir ir_1(.*);
-	memory my_mem(.reset(rst), .*);
 
 	//===========================
 	// tri-state buffers
@@ -38,8 +39,6 @@ module top(
 	ts_driver tsd_2(.din(PCOut), .dout(Buss), .en(enaPC));
 	ts_driver tsd_3(.din(ALUOut), .dout(Buss), .en(enaALU));
 	ts_driver tsd_4(.din(mdrOut), .dout(Buss), .en(enaMDR));
-	
-	parameter size = 5;
 
 	typedef enum logic [3:0] { 
 				AND=4'b0101, 
@@ -139,6 +138,17 @@ module top(
 	   default : next_state = FET0;
 	  endcase
 	end
+
+
+  always @(posedge clk) begin
+    if (rst == 1'b1) 										   
+			mdr_reg <= '0; 
+		mar_reg <= '0;
+	else if (ldMDR)
+	    mdr_reg <=    selMDR ? memOut : Buss;
+	else if (ldMAR)
+	    mar_reg <=    Buss;
+  end
 	
 	//----------------Sequential Logic--------------------
 	always @ (posedge clk) begin 

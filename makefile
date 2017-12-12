@@ -21,7 +21,7 @@ ENV_FILES =  generator.sv environment.sv lc3_if.sv
 SVM_FILES = svm_component.sv svm_component_wrapper.sv svm_factory.sv svm_component_reg.sv   
 TEST_FILES = test_base.sv test.sv
 TAYLOR_FILES = ./lc3_taylor/datapath.sv ./lc3_taylor/controller.sv ./lc3_taylor/lc3.sv
-NATE_FILES = lc3_nate/lc3.sv
+NATE_FILES = ./lc3_nate/eab.v ./lc3_nate/pc.sv ./lc3_nate/regfile8x16.sv ./lc3_nate/nzp.sv ./lc3_nate/ts_driver.v ./lc3_nate/alu.sv ./lc3/nate/ir.v ./lc3_nate/top.sv
 DUT_FILES = ${NATE_FILES}
 ifeq (${DUT},taylor)
 	DUT_FILES = ${TAYLOR_FILES}
