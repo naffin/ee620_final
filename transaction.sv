@@ -3,6 +3,7 @@ package Transaction_pkg;
 class Transaction;
 	// stimulus
    static int trans_count = 0;
+   static int unsigned reset_prob = 10000;
    int id;
 	rand Opcode opcode;
 	rand bit [2:0] dr;
@@ -20,6 +21,7 @@ class Transaction;
 	rand bit [15:0] data1, data2;
 	rand int unsigned rst_counter;
    rand bit reset;
+   rand bit [2:0] br_nzp;
    
 	
 	// state 
@@ -34,7 +36,7 @@ class Transaction;
 	bit [15:0] data_in_q [$];	
 
 	constraint rst_counter_value {
-	   reset dist {0:=9, 1:=1};
+	   reset dist {0:=reset_prob, 1:=1};
 		// set rst_counter constraints based on the opCode	
 	};
 
@@ -69,7 +71,7 @@ class Transaction;
 	     NOT : 
 	       inst[11:0] = {dr,sr,6'b111111};
 	     BR	: 
-	       inst[11:0] = {n,z,p,PCoffset9}; //TODO : this should be N,Z,P
+	       inst[11:0] = {br_nzp,PCoffset9}; //TODO : this should be N,Z,P
 	     JMP : 
 	       inst[11:0] = {3'b000,BaseR,6'b000000};
 	     JSR : 

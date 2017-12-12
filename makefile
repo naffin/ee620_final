@@ -14,20 +14,20 @@
 ## Initial check in
 ##
 ############################################################################
-TRANSACTION_FILES = opcode.sv transaction.sv
+TRANSACTION_FILES = opcode.sv transaction.sv assert_macros.sv
 COVERAGE_FILES = coverage_base.sv coverage.sv
-DRIVER_FILES = monitor.sv checker.sv scoreboard.sv driver_cbs.sv driver_cbs_scb.sv driver.sv
+DRIVER_FILES = checker.sv scoreboard.sv driver_cbs.sv driver_cbs_scb.sv driver.sv
 ENV_FILES =  generator.sv environment.sv lc3_if.sv
 SVM_FILES = svm_component.sv svm_component_wrapper.sv svm_factory.sv svm_component_reg.sv   
-TEST_FILES = test_base.sv test.sv
-TAYLOR_FILES = ./lc3_taylor/datapath.sv ./lc3_taylor/controller.sv ./lc3_taylor/lc3.sv
-NATE_FILES = ./lc3_nate/eab.v ./lc3_nate/pc.sv ./lc3_nate/regfile8x16.sv ./lc3_nate/nzp.sv ./lc3_nate/ts_driver.v ./lc3_nate/alu.sv ./lc3/nate/ir.v ./lc3_nate/top.sv
+TEST_FILES = test_base.sv test_reset.sv test.sv
+TAYLOR_FILES = ./lc3_taylor/datapath.sv ./lc3_taylor/controller.sv ./lc3_taylor/lc3.sv monitor_taylor.sv ./lc3_taylor/datapath_asserts.sv ./lc3_taylor/controller_asserts.sv ./lc3_taylor/bindfiles.sv
+NATE_FILES = ./lc3_nate/eab.v ./lc3_nate/pc.sv ./lc3_nate/regfile8x16.sv ./lc3_nate/nzp.sv ./lc3_nate/ts_driver.v ./lc3_nate/alu.sv ./lc3/nate/ir.v ./lc3_nate/top.sv monitor_nate.sv
 DUT_FILES = ${NATE_FILES}
 ifeq (${DUT},taylor)
 	DUT_FILES = ${TAYLOR_FILES}
 endif
-VERILOG_FILES = ${TRANSACTION_FILES} ${COVERAGE_FILES} ${DRIVER_FILES} ${ENV_FILES} ${SVM_FILES} ${TEST_FILES} ${DUT_FILES} top.sv	
-TOPLEVEL = top
+VERILOG_FILES = ${TRANSACTION_FILES} ${COVERAGE_FILES} ${DUT_FILES} ${DRIVER_FILES} ${ENV_FILES} ${SVM_FILES} ${TEST_FILES} top.sv	
+TOPLEVEL = top bindfiles
 
 
 help:

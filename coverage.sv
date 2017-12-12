@@ -4,6 +4,7 @@ package Coverage_pkg;
    import Opcode_pkg::*;
 class Coverage extends Coverage_base;
    Transaction t;
+   int unsigned num_reg_value_bins = 1024;
    covergroup all_ops();
       all_ops: coverpoint t.opcode;
    endgroup // all_ops
@@ -94,6 +95,20 @@ class Coverage extends Coverage_base;
       consecutive_opc: coverpoint t.opcode{
 	 bins consecutive_ops[] = ([0:$] => [0:$]);
       }
+   endgroup // consecutive_ops
+
+   covergroup values_in_regs();
+      pc_values: coverpoint t.pc{option.auto_bin_max=num_reg_value_bins;}
+   endgroup // values_in_regs
+
+   bit [2:0] nzp_regs;
+   covergroup br_control();
+      br_nzp: coverpoint t.br_nzp iff (t.opcode == BR) {option.weight = 0;}
+      nzp_regs: coverpoint nzp_regs {
+	 bins nzp_regs[] = {3'b0,3'b001,3'b010,3'b100};
+	 option.weight = 0;
+      }
+      control_cross: cross br_nzp,nzp_regs;
    endgroup
    
 
@@ -102,15 +117,20 @@ class Coverage extends Coverage_base;
       all_instruction_regs = new();
       reset_all_cycles = new();
       consecutive_ops = new();
+      values_in_regs = new();
+      br_control = new();
    endfunction
       
       
    function void sample(Transaction t);
       this.t = t;
+      nzp_regs = {t.n,t.z,t.p};
+      values_in_regs.sample();
       if(!t.reset) begin
 	 all_ops.sample();
 	 all_instruction_regs.sample();
 	 consecutive_ops.sample();
+	 br_control.sample();
       end
       if(t.reset) begin
 	 reset_all_cycles.sample();

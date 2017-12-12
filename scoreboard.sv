@@ -93,7 +93,7 @@ class Scoreboard;
 	NOT:
 	  set_dr(~reg_file[t.sr]);
 	BR:
-	  if(t.n&n | t.z&z | t.p&p)
+	  if(t.br_nzp & {n,z,p})
 	    pc = pc + 16'(signed'(t.PCoffset9));
 	JMP:
 	  pc = reg_file[t.BaseR];
