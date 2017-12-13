@@ -15,6 +15,20 @@ module datapath_asserts(
    input logic [15:0] MAR,MDR);
 `include "assert_macros.sv"
 
+//====== reset assertions Nate added ========
+   ERR_RESET_SHOULD_CAUSE_PC_0_IR_0_REGFILE_0:
+      `assert_clk(rst |-> ##1 PC=='0 && IR=='0 &&
+      						  reg_file[0] == '0 &&
+							  reg_file[1] == '0 &&
+							  reg_file[2] == '0 &&
+							  reg_file[3] == '0 &&
+							  reg_file[4] == '0 &&
+							  reg_file[5] == '0 &&
+							  reg_file[6] == '0 &&
+							  reg_file[7] == '0);
+
+//====== end of what Nate added =============
+
    ERR_N_HIGH_AFTER_NEG_BUS_AND_FLAGWE:
      `assert_clk_xrst(16'(signed'(bus)) < 0 && flagWE |-> ##1 N);
    ERR_N_LOW_AFTER_NON_NEG_BUS_AND_FLAGWE:

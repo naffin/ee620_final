@@ -20,8 +20,43 @@ module lc3_asserts (
 	input rst, clk,
 	input [15:0] MDR, MAR);
 
-    ERR_RESET_SHOULD_CAUSE_PCOUT0_0:
-		`assert_clk(rst |-> ##1 PCOut==0);
+	ERR_RESET_SHOULD_CAUSE_PCOUT_0_IR_0:
+		`assert_clk(rst |-> ##1 PCOut=='0 && IR=='0);
+	
+	ERR_MORE_THAN_ONE_OF_NZP_IS_HIGH:
+		`assert_clk_xrst(3'(N)+3'(P)+3'(Z) <= 1);
 
-		
+	ERR_N_HIGH_AFTER_NEG_BUS_AND_FLAGWE:
+		`assert_clk_xrst(16'(signed'(Buss)) < 0 && flagWE |-> ##1 N);
+
+	ERR_N_LOW_AFTER_NON_NEG_BUS_AND_FLAGWE:
+		`assert_clk_xrst(16'(signed'(Buss)) >= 0 && flagWE |-> ##1 !N);
+
+	ERR_Z_HIGH_AFTER_ZERO_BUS_AND_FLAGWE:
+	  `assert_clk_xrst(Buss == 0 && flagWE |-> ##1 Z);
+
+	ERR_Z_LOW_AFTER_NON_ZERO_BUS_AND_FLAGWE:
+	  `assert_clk_xrst(Buss != 0 && flagWE |-> ##1 !Z);
+
+	ERR_P_HIGH_AFTER_POS_BUS_AND_FLAGWE:
+	  `assert_clk_xrst(16'(signed'(Buss)) > 0 && flagWE |-> ##1 P);
+
+	ERR_P_LOW_AFTER_NON_POS_BUS_AND_FLAGWE:
+	  `assert_clk_xrst(16'(signed'(Buss)) <= 0 && flagWE |-> ##1 !P);
+
+   ERR_ONLY_ONE_TRI_DRIVER_HIGH:
+     `assert_clk_xrst(3'(enaALU)+3'(enaMARM)+3'(enaPC)+3'(enaMDR) <= 1);
+	
+   ERR_BUS_ONLY_TAKES_MARM_WHEN_ENA_MARM:
+     `assert_clk_xrst(enaMARM |-> Buss == MARMUXOut);
+
+   ERR_BUS_ONLY_TAKES_PC_WHEN_ENA_PC:
+     `assert_clk_xrst(enaPC |-> Buss == PCOut);
+
+   ERR_BUS_ONLY_TAKES_MDR_WHEN_ENA_MDR:
+     `assert_clk_xrst(enaMDR |-> Buss == MDR);
+
+   ERR_BUS_ONLY_TAKES_ALU_WHEN_ENA_ALU:
+     `assert_clk_xrst(enaALU |-> Buss == ALUOut);
+
 endmodule
