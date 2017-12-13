@@ -4,3 +4,5 @@ wave.do
 transcript
 modelsim.*
 *#*
+*.ucdb
+*covhtmlreport*

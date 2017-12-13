@@ -16,10 +16,14 @@ package Environment_pkg;
    import Checker_pkg::*;
 
 class Config;
-   rand bit [31:0] run_for_n_trans;
-   constraint num_trans {
-      run_for_n_trans == 10000;
-   }
+   int unsigned run_for_n_trans = 10000;
+   function new();
+      if($value$plusargs("NUM_TRANS=%d", run_for_n_trans))
+	if(run_for_n_trans == 0)
+	  $display("Config set to run until coverage complete.");
+	else
+	  $display("Config set to run for %d transactions.",run_for_n_trans);
+   endfunction
 endclass : Config
 
 class Environment;
@@ -58,7 +62,6 @@ class Environment;
 
    function void gen_cfg();
       cfg = new();
-      `SV_RAND_CHECK(cfg.randomize());
    endfunction
    
    task wrap_up();

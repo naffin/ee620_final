@@ -56,8 +56,8 @@ class Checker;
 		mon2check.get(t_mon);
 		if(compare())
 		   cov.sample(t_mon);
-		else
-		  break;
+		else 
+		   break;
 	      if($get_coverage() == 100)
 	      	break;
 	   end
