@@ -21,7 +21,7 @@ module lc3_asserts (
 	input [15:0] MDR, MAR);
 
     ERR_RESET_SHOULD_CAUSE_PCOUT0_0:
-		`assert_clk(rst |-> PCOut==0);
+		`assert_clk(rst |-> ##1 PCOut==0);
 
 		
 endmodule
