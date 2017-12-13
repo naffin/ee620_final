@@ -15,7 +15,7 @@ module pc(
 	
 	assign pcInc = PCOut + 1;
 	// 3-to-1 mux
-	assign muxOut = (selPC == 0)? pcInc : (selPC == 1)? eabOut : PCOut;
+	assign muxOut = (selPC == 0)? pcInc : (selPC == 1)? eabOut : Buss;
 	assign PCOut = PCreg;
 	
 	

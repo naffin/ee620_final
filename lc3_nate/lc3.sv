@@ -1,27 +1,24 @@
-// data path verilog
-//
-
 module lc3(lc3_if.DUT lc3if);
 	reg enaMARM, enaPC, enaMDR, enaALU,
 	  flagWE, ldIR, ldPC, selEAB1,
-	  selMAR, regWE;
+	  selMARM, regWE;
 	reg [1:0] selEAB2, selPC;
 	reg [2:0] DR, SR1, SR2;
 	reg [1:0] ALUctrl;	
 	wire N, Z, P, TB;
 	wire [15:0] eabOut, Ra, Rb, Buss;
 	wire [15:0] PCOut, ALUOut;
-	wire [15:0] IR, MARMUXOut, mdrOut;
-	wire [7:0] zext;
+	wire [15:0] IR, MARMUXOut;
+	wire [15:0] zext;
 	reg selMDR, ldMDR;
 	wire rst, clk;
-	logic [15:0] MDR, MAR;
+	reg [15:0] MDR, MAR;
 
-	assign zext =  {{8{IR[7]}}, IR[7:0]};
-	assign MARMUXOut = (selMAR) ? zext : eabOut;
+	assign zext =  {{8{0}}, IR[7:0]};
+	assign MARMUXOut = (selMARM) ? zext : eabOut;
 
 	assign rst = lc3if.rst;
-	assign rst = lc3if.clk;
+	assign clk = lc3if.clk;
 	assign lc3if.addr= MAR;
 	assign lc3if.data_in = MDR;
 
@@ -40,7 +37,7 @@ module lc3(lc3_if.DUT lc3if);
 	ts_driver tsd_1(.din(MARMUXOut), .dout(Buss), .en(enaMARM));
 	ts_driver tsd_2(.din(PCOut), .dout(Buss), .en(enaPC));
 	ts_driver tsd_3(.din(ALUOut), .dout(Buss), .en(enaALU));
-	ts_driver tsd_4(.din(mdrOut), .dout(Buss), .en(enaMDR));
+	ts_driver tsd_4(.din(MDR), .dout(Buss), .en(enaMDR));
 
 	typedef enum logic [3:0] { 
 				AND=4'b0101, 
@@ -60,7 +57,7 @@ module lc3(lc3_if.DUT lc3if);
 				RTI=4'b1000,
 				RESERVED=4'b1101} Opcode;
 
-	typedef enum {IDLE, FET0, FET1, FET2, DECODE,
+	typedef enum {FET0, FET1, FET2, DECODE,
 				AND0, ADD0, NOT0, JSR0, JSR1, JSRR1,
 				BR0, LD0_ST0, LD1, LD2, LDI0_STI0, LDI1_STI1, LDI2_STI2, 
 				LDR0_STR0, LEA0, ST1, ST2, JMP0, 
@@ -76,7 +73,6 @@ module lc3(lc3_if.DUT lc3if);
 	always @ (state or opCode) begin
 	 next_state = FET0;
 	 case(state) 
-	   	IDLE :  	next_state = FET0;
 	   	FET0:		next_state = FET1; 
 	   	FET1:		next_state = FET2; 
 	   	FET2:		next_state = DECODE;
@@ -123,18 +119,20 @@ module lc3(lc3_if.DUT lc3if);
 		LDR0_STR0 : begin	
 			if(opCode == LDR)
 				next_state = LD1;
-			if(opCode == STI)
+			if(opCode == STR)
 				next_state = ST1;
 			end
 		BR0: 		next_state = FET0;
 		JMP0: 		next_state = FET0;
 		JSR0: begin
-			if(IR[11] == 1) next_state = JSR1;
+			if(IR[11] == 1'b1) next_state = JSR1;
 			else next_state = JSRR1;
 			end
 		JSR1: 		next_state = FET0;
 		JSRR1: 		next_state = FET0;
-		TRAP0: 		next_state = FET0;
+		TRAP0: 		next_state = TRAP1;
+		TRAP1: 		next_state = TRAP2;
+		TRAP2: 		next_state = FET0;
 		LEA0: 		next_state = FET0;
 		
 	   default : next_state = FET0;
@@ -148,50 +146,42 @@ module lc3(lc3_if.DUT lc3if);
 		MAR <= '0;
 	end
 	else if (ldMDR)
-	    MDR <=    selMDR ? lc3if.data_out : Buss;
+	    MDR <= selMDR ? lc3if.data_out : Buss;
 	else if (lc3if.ldMAR)
-	    MAR <=    Buss;
+	    MAR <= Buss;
   end
 	
 	//----------------Sequential Logic--------------------
 	always @ (posedge clk) begin 
 	  if (rst == 1'b1) begin
-	    state <=    IDLE;
+	    state <= FET0;
 	  end else begin
-	    state <=    next_state;
+	    state <= next_state;
 	  end
 	end
 
 	//--------------------Output Logic--------------------
-	always @ (state) begin
-		if (rst == 1'b1) begin
-			enaPC <= 1'b0;
-			lc3if.ldMAR <= 1'b0;
-			ldPC  <= 1'b0;
-			ldMDR <= 1'b0;
-			enaMDR <= 1'b0;
-			ldIR <= 1'b0;
-			enaALU <= 1'b0;
-			enaMARM <= 1'b0;	
-			regWE <= 1'b0;
-			// Don't think anything needs to happend here
-		end
-		else begin
-		// reset signals
-		enaPC <= 1'b0;
+	always @(*) begin
 		lc3if.ldMAR <= 1'b0;
-		ldPC  <= 1'b0;
-		ldMDR <= 1'b0;
-		enaMDR <= 1'b0;
-		ldIR <= 1'b0;
-		enaALU <= 1'b0;
-		enaMARM <= 1'b0;	
-		regWE <= 1'b0;
+		ldPC  <= '0;
+		ldMDR <= '0;
+		ldIR <= '0;
+		regWE <= '0;
+		flagWE <= '0;
 		lc3if.memWE <= 1'b0;
+		//=== select signals default ====
+		selMARM<= '0;
+		selMDR<= '0;
+		selEAB2 <= '0;
+		selEAB1 <= '0;
+		selMARM <= '0;
+		selPC<= '0;
+		//=== enable signals default ====
+		enaPC <= '0;
+		enaMDR <= '0;
+		enaALU <= '0;
+		enaMARM <= '0;	
 		  unique case(state)
-			IDLE : 	begin
-					// nothing here
-				end
 	   		FET0:  	begin
 					enaPC <= 1'b1;
 					lc3if.ldMAR <= 1'b1;
@@ -207,7 +197,6 @@ module lc3(lc3_if.DUT lc3if);
 					ldIR  <= 1'b1;
 				end
 	   		DECODE:	begin
-					// no outputs	
 				end
 	   		ADD0:begin
 					SR1 <= IR[8:6];	
@@ -239,7 +228,7 @@ module lc3(lc3_if.DUT lc3if);
 					// send address to memory
 					selEAB2 <= 2'b10; 	// load in sign extended PCoffset9
 					selEAB1 <= 1'b0;  	// load in current PC
-					selMAR <= 1'b0; 	// select output of PC+PCoffset9 to drive Buss
+					selMARM <= 1'b0; 	// select output of PC+PCoffset9 to drive Buss
 					enaMARM <= 1'b1;	
 					lc3if.ldMAR <= 1'b1;
 				end
@@ -258,6 +247,7 @@ module lc3(lc3_if.DUT lc3if);
 			LDI0_STI0:begin // MAR <- PC+off9
 					lc3if.ldMAR <= 1'b1;
 					enaMARM <= 1'b1;
+					selMARM <= 1'b0;
 					selEAB2 <= 2'b10;
 					selEAB1 <= 1'b0;
 				end
@@ -270,10 +260,12 @@ module lc3(lc3_if.DUT lc3if);
 					enaMDR<= 1'b1;
 				end
 			LDR0_STR0:begin // MAR <- MDR 
+					selEAB1 <= 1'b1;	
 					selEAB2 <= 2'b01;	
-					selPC <= 1'b1;	
 					enaMARM <= 1'b1;
+					selMARM <= 1'b0;
 					lc3if.ldMAR<= 1'b1;
+					SR1 <= IR[8:6];
 				end
 			ST1:begin
 					// write data from regfile to memory
@@ -315,15 +307,16 @@ module lc3(lc3_if.DUT lc3if);
 					selEAB1 <= 1'b1;	
 					selEAB2 <= 2'b00;		
 					ldPC <= 1'b1;	
+					SR1 <= IR[8:6];
 				end
 			TRAP0:begin 
 					enaMARM <= 1'b1;
-					selMAR <= 1'b1;
+					selMARM <= 1'b1;
 					lc3if.ldMAR <= 1'b1;
 				end
 			TRAP1:begin 
-					selMDR <= 1'b1;		// sel data from memory
-					ldMDR  <= 1'b1;		// load data from memory into MDR
+					selMDR <= 1'b1;		
+					ldMDR  <= 1'b1;	
 					enaPC <= 1'b1;
 					regWE <= 1'b1;
 					DR <= 3'b111;
@@ -331,19 +324,20 @@ module lc3(lc3_if.DUT lc3if);
 			TRAP2:begin 
 					enaMDR <= 1'b1;
 					selPC <= 2'b10;
+					ldPC <= 1'b1;
 				end
 			LEA0:begin // DR <– PC+off9
 					DR <= IR[11:9];
 					regWE <= 1'b1;	
+					flagWE <= 1'b1;	
 					selEAB1 <= 1'b0;
 					selEAB2 <= 2'b10;
-					selMAR <= 1'b0;
+					selMARM <= 1'b0;
 					enaMARM <= 1'b1;
 				end
 		   default : begin
 					end
 		  endcase
-		end
 	end // End Of Block OUTPUT_LOGIC
 
 endmodule
