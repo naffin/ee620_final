@@ -6,3 +6,5 @@ modelsim.*
 *#*
 *.ucdb
 *covhtmlreport*
+vcover.log
+vsim.wlf
