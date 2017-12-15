@@ -10,8 +10,9 @@ class Coverage extends Coverage_base;
    covergroup all_ops();
       all_ops: coverpoint t.opcode;
    endgroup // all_ops
-
+   
    covergroup all_instruction_regs();
+      option.per_instance = 1;
       dr_ops: coverpoint t.opcode{
       	 bins dr_ops[] = {ADD,AND,NOT,LD,LDI,LDR,LEA};
 	 option.weight=0;
@@ -46,6 +47,7 @@ class Coverage extends Coverage_base;
    bit [4:0] rst_opcode;
    
    covergroup reset_all_cycles();
+      option.per_instance = 1;
       ops_3_cycles: coverpoint t.opcode{
 	 bins ops_3_cycles[] = {RTI,RESERVED};
 	 option.weight=0;
@@ -102,6 +104,7 @@ class Coverage extends Coverage_base;
    endgroup // consecutive_ops
 
    covergroup offsets_and_imm5();
+      option.per_instance = 1;
       option.auto_bin_max = max_num_bins;
       imm5_ops: coverpoint t.opcode{
 	 bins imm5_ops[] = {ADD,AND} iff (t.imm5_flag);
@@ -153,6 +156,7 @@ class Coverage extends Coverage_base;
 
    bit [2:0] nzp_regs;
    covergroup br_control();
+      option.per_instance = 1;
       br_nzp: coverpoint t.br_nzp iff (t.opcode == BR) {option.weight = 0;}
       nzp_regs: coverpoint nzp_regs {
 	 bins nzp_regs[] = {3'b0,3'b001,3'b010,3'b100};
@@ -186,11 +190,11 @@ class Coverage extends Coverage_base;
       rst_opcode = {t.reset,t.opcode};
       values_in_regs.sample();
       num_conseq_trans_cov.sample();
+      consecutive_ops.sample();
       if(!t.reset) begin
 	 num_conseq_trans++;
 	 all_ops.sample();
 	 all_instruction_regs.sample();
-	 consecutive_ops.sample();
 	 br_control.sample();
 	 offsets_and_imm5.sample();
       end

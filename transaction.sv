@@ -4,6 +4,8 @@ class Transaction;
 	// stimulus
    static int trans_count = 0;
    static int unsigned reset_prob = 10000;
+   static bit error_found = 0;
+   
    int id;
 	rand Opcode opcode;
 	rand bit [2:0] dr;
