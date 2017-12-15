@@ -3,7 +3,8 @@
 wave.do
 transcript
 modelsim.*
-vcover.log
 *#*
 *.ucdb
 *covhtmlreport*
+vcover.log
+vsim.wlf

@@ -66,6 +66,10 @@ class Environment;
    
    task wrap_up();
       $display("Number of transactions sent: %0d", Transaction::trans_count);
+      if(Transaction::error_found)
+	$display("An error was found and simulation was terminated.");
+      else
+	$display("No errors were found.");
    endtask
 endclass
 endpackage

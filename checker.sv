@@ -56,8 +56,10 @@ class Checker;
 		mon2check.get(t_mon);
 		if(compare())
 		   cov.sample(t_mon);
-		else 
+		else begin
+		   Transaction::error_found = 1;
 		   break;
+		end
 	      if($get_coverage() == 100)
 	      	break;
 	   end
